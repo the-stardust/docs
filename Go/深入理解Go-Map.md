@@ -28,7 +28,7 @@ map数据结构有src/runtime/map.go 中的hmap定义
 
 下面展示一个简单的map
 
-![upload successful](http://blogs.xinghe.host/images/pasted-72.png)
+![upload successful](../images/pasted-72.png)
 
 此map含有四个bucket， hmap.B = 2, 元素经过哈希函数运算过后会落到其中一个bucket中进行存储，查找过程类似
 
@@ -47,7 +47,7 @@ bucket很多时候被翻译为桶，所谓的**哈希桶**，时间上就是buck
 - key-value数据，存放顺序是key/key/key/...value/value/value，如此存放是为了节省字节对齐带来的空间浪费（这点我也不懂）
 
 下图展示bucket存储8个key-value：
-![upload successful](http://blogs.xinghe.host/images/pasted-73.png)
+![upload successful](../images/pasted-73.png)
 
 ## 哈希冲突
 
@@ -55,7 +55,7 @@ bucket很多时候被翻译为桶，所谓的**哈希桶**，时间上就是buck
 
 下图展示发生哈希冲突后的map：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-74.png)
+![upload successful](../images/pasted-74.png)
 
 bucket的数据结构指示下一个bucket的指针成为overflow bucket，意为当前bucket溢出的部分，事实上哈希冲突不是什么好事，好的哈希算法可以保证哈希值的随机性，避免冲突过多，冲突过多就会进行扩容
 
@@ -87,19 +87,19 @@ bucket的数据结构指示下一个bucket的指针成为overflow bucket，意�
 
 下图展示了包含一个bucket满载的map(为了描述方便，图中bucket省略了value区域):
 
-![upload successful](http://blogs.xinghe.host/images/pasted-75.png)
+![upload successful](../images/pasted-75.png)
 
 当前map存储了7个key-value，只有一个bucket，此时的负载因子是7，当再次发生冲突的时候，就会发生扩容现象，扩容之后再将新插入的键插入新的bucket
 
 当第8个key-value插入的时候，将会发生扩容，如图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-76.png)
+![upload successful](../images/pasted-76.png)
 
 hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请的bucket，新的key-value被插入到了新的bucket中，后续对map的访问操作会触发迁移，将oldbuckets中的key-value慢慢搬迁到新的bucket中，直到搬迁完毕，删除oldbuckets
 
 搬迁完成如图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-77.png)
+![upload successful](../images/pasted-77.png)
 
 数据搬迁过程中，原来的key-value会存储在新的bucket前面，新插入的key-value会村雨新的bucket的后面，实际搬迁过程非常复杂
 
@@ -107,7 +107,7 @@ hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请�
 
 所谓等量扩容，实际上不是扩大容量，是一种类似增量扩容的搬迁操作，因为有一种情况是，不断的增删，而键值对正好集中在一小部分的bucket，这样会造成overflow的bucket非常的多，而每个bucket又很稀疏，负载因子就会偏小，无法进行增量扩容，如下图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-78.png)
+![upload successful](../images/pasted-78.png)
 
 上图中，overflow的bucket大部分都是空的，访问效率会很差，此时进行一次等量扩容，即**buckets的树立不变，经过重新组织后的overflow的bucket会减少**，即节省了空间又增加了访问效率
 

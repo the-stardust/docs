@@ -228,7 +228,7 @@ epoll除了提供select/poll那种IO事件的**水平触发（Level Triggered）
 
 也就是边沿触发与水平触发，首先，现在基本上我们所使用的模型都是**非阻塞I/O的边沿触发**模型
 
-![upload successful](http://blogs.xinghe.host/images/pasted-43.png)
+![upload successful](../images/pasted-43.png)
 
 使用电路上的知识，上升沿与下降沿与边沿触发相似，水平沿与水平触发类似
 

@@ -25,7 +25,7 @@ Mutrx用起来特别方便，但其中内部实现却非常复杂，包括Mutex�
 
 Mutex.state 是一个32位的整形数字，其中分为四块，代表Mutex的四种状态
 
-![upload successful](http://blogs.xinghe.host/images/pasted-82.png)
+![upload successful](../images/pasted-82.png)
 
 - Locked 表示互斥锁是否被锁定，1锁定0未锁定
 - Woken 表示是否有协程已被唤醒 0没有1已有协程唤醒，正在加锁过程中
@@ -50,7 +50,7 @@ Mutex对外有两个方法
 
 假定当前只有一个协程在加锁，没有其他协程在干扰，过程入下图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-83.png)
+![upload successful](../images/pasted-83.png)
 
 加锁过程会去判断当前Locked位是否为0，如果是0把Locked变为1，代表加锁成功，从上图可见，加锁成功后，Locked位为1
 
@@ -58,7 +58,7 @@ Mutex对外有两个方法
 
 假定加锁的时候，锁被其他协程锁持有，则如图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-84.png)
+![upload successful](../images/pasted-84.png)
 
 从上图看到，当协程B试图获取锁的时候，当前Locked为1，所以加锁被阻塞，Waiter加1，此时协程B将被阻塞，知道Locked值变成0的时候才会被唤醒（暂不考虑自旋，后面单独讲自旋）
 
@@ -66,7 +66,7 @@ Mutex对外有两个方法
 
 假定解锁时，没有其他协程阻塞，Waiter=0，解锁如下：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-85.png)
+![upload successful](../images/pasted-85.png)
 
 由于没有其他协程在阻塞，所以直接把Locked位改成0，不需要释放信号量
 
@@ -74,7 +74,7 @@ Mutex对外有两个方法
 
 假设解锁时有1个或者多个协程在阻塞，此时解锁如下图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-86.png)
+![upload successful](../images/pasted-86.png)
 
 协程A解锁过程发生两个步骤，一是把Locked位变为0,二是查看到Waiter>0，所以释放一个信号量，唤醒一个阻塞的协程，被唤醒的协程B把Locked置为1，于是协程B获得锁
 
@@ -185,7 +185,7 @@ RWMutex提供四个简答的接口来提供服务
 
 所以 func(rw *RWMutex) Lock()接口实现的流程图如下：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-87.png)
+![upload successful](../images/pasted-87.png)
 
 #### Unlock()实现逻辑
 
@@ -195,7 +195,7 @@ RWMutex提供四个简答的接口来提供服务
 
 所以 func(rw *RWMutex) Unlock() 接口实现流程如下：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-88.png)
+![upload successful](../images/pasted-88.png)
 
 #### RLock()实现逻辑
 
@@ -205,7 +205,7 @@ RWMutex提供四个简答的接口来提供服务
 
 所以 func (rw *RWMutex) RLock() 所实现的流程如下：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-89.png)
+![upload successful](../images/pasted-89.png)
 
 #### RUnlock()实现逻辑
 
@@ -215,7 +215,7 @@ RWMutex提供四个简答的接口来提供服务
 
 所以func (rw *RWMutex)RUnlock() 实现的流程如下：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-90.png)
+![upload successful](../images/pasted-90.png)
 
 > 注意：并不是每一个读操作解除锁定的时候都会唤醒写阻塞的协程，而是最后一个解除读锁定的协程才会释放信号量将该协程唤醒，因为只有所有读操作的协程释放锁之后才可以唤醒协程
 
@@ -257,7 +257,7 @@ RWMutex提供四个简答的接口来提供服务
 
 所以，写操作就相当于把一段连续的读操作划分成两部分，前面的读操作结束后唤醒写操作，写操作结束后，唤醒后面半部分的读操作，如下图所示：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-91.png)
+![upload successful](../images/pasted-91.png)
 
 ## 关于源码
 

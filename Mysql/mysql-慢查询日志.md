@@ -75,9 +75,9 @@ slow_query_log 和slow_query_log_file后，然后重启MySQL服务器。也即�
 - set profiling=1; 开启
 - 查看结果，show profiles;
 
-![upload successful](http://blogs.xinghe.host/images/pasted-26.png)
+![upload successful](../images/pasted-26.png)
 - 诊断SQL，show profile cpu,block io for query n (n为上一步前面的问题SQL数字号码
-![upload successful](http://blogs.xinghe.host/images/pasted-27.png)
+![upload successful](../images/pasted-27.png)
 cpu block io 等参数说明
   type: 
   

@@ -31,7 +31,7 @@
 
 布隆过滤器是一个 bit 向量或者说 bit 数组 也叫 位数组，长这样：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-140.png)
+![upload successful](../images/pasted-140.png)
 
 1. 首选初始化一个bit数组，把每一位都设置成0
 2. 如果想要存储值{x,y,z}到位数组中，依次把x,y,z每个元素分别经过多个不同的哈希函数生成多个哈希值，每个哈希值对应一个数组下标，把数组当前下标的值设置为1

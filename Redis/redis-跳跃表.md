@@ -14,7 +14,7 @@
 
 如图所示：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-108.png)
+![upload successful](../images/pasted-108.png)
 
 ### 为什么这么设计
 
@@ -38,7 +38,7 @@
         void *value;
       } listNode;
     
-![upload successful](http://blogs.xinghe.host/images/pasted-109.png)
+![upload successful](../images/pasted-109.png)
 
 典型的双向链表
 
@@ -50,13 +50,13 @@
 
 字典由三个数据结构组成，下图是字典的哈希表数据结构：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-110.png)
+![upload successful](../images/pasted-110.png)
 
 与java中的hashmap很类似，就是数组加链表，hash冲突利用拉链法解决
 
 下图才是真正的字典的数据结构
 
-![upload successful](http://blogs.xinghe.host/images/pasted-111.png)
+![upload successful](../images/pasted-111.png)
 
 有两个dictht，一般来说只用ht[0],当发生扩容发生rehash的时候，ht[1]才产生作用
 
@@ -130,7 +130,7 @@ dictht的插入：
     
 可以画出结构图
 
-![upload successful](http://blogs.xinghe.host/images/pasted-112.png)
+![upload successful](../images/pasted-112.png)
 
 其实跳表就是一个利用空间换时间的数据结构，利用 level 作为链表的索引。
 
@@ -151,7 +151,7 @@ dictht的插入：
 #### 创建
 zskiplist的创建时间复杂度为O(1),头节点不是一个有效节点，有32层，高版本可能是64层，每层的foward指针指向该层跳跃表的第一个节点，没有则为null
 
-![upload successful](http://blogs.xinghe.host/images/pasted-113.png)
+![upload successful](../images/pasted-113.png)
 
 #### 插入
 
@@ -188,15 +188,15 @@ zskiplist的创建时间复杂度为O(1),头节点不是一个有效节点，有
 压缩列表是Redis为了节约内存而开发的,是由一系列特殊编码的连续内存块组成的顺序型(sequential)数据结构
 
 
-![upload successful](http://blogs.xinghe.host/images/pasted-114.png)
+![upload successful](../images/pasted-114.png)
 
 
-![upload successful](http://blogs.xinghe.host/images/pasted-115.png)
+![upload successful](../images/pasted-115.png)
 
 ### 节点
 
 
-![upload successful](http://blogs.xinghe.host/images/pasted-116.png)
+![upload successful](../images/pasted-116.png)
 
 - previous_entry_length:每个节点都会用一个或者五个字节来描述前一个节点占用的总字节数，如果前一个字节占用总字节数小于254，那么就用一个字节存储，如果超过254，那么一个字节就不够了，这里会用五个字节存储并将第一个字节的值存储为固定的254用于区分
 - encoding：压缩列表可以存储16位，32位、64位的整数以及字符串，encoding就是用来区分后面content字段中存储的到底是哪种内容，分别占多少字节
@@ -244,7 +244,7 @@ previous_entry_length属性记录了前一个节点的长度,如果前一个节�
 
 现在假如一个压缩列表,有许多连续的,长度介于250~253字节之间的节点e1至eN
 
-![upload successful](http://blogs.xinghe.host/images/pasted-118.png)
+![upload successful](../images/pasted-118.png)
 
 现在这些节点的previous_entry_length都只需要1字节长的,如果这时候我将长度为254的新节点new设置为压缩列表的表头节点,那么new就是e1的前置节点..
 

@@ -29,7 +29,7 @@
 
 每个shard分布在不同的机器上，每个shard的副本分布在不同于当前shard的机器上，这样一来，就算有一台机器宕机，其他机器上也有副本数据
 
-![upload successful](http://blogs.xinghe.host/images/pasted-151.png)
+![upload successful](../images/pasted-151.png)
 
 每个shard有一个peimary shard，负责写入数据然后同步给其他的replica shard
 
@@ -48,7 +48,7 @@ es集群有多个节点，会选举出来一个master节点，master节点主要
 - 实际的node上的primary node处理请求，然后把数据同步给replica node
 - coordinating node 如果发现primary node和所有的replica node都处理完之后，返回给客户端响应结果
 
-![upload successful](http://blogs.xinghe.host/images/pasted-152.png)
+![upload successful](../images/pasted-152.png)
 
 ### 读数据过程
 
@@ -70,7 +70,7 @@ es集群有多个节点，会选举出来一个master节点，master节点主要
 
 !> 写请求是写入 primary shard，然后同步给所有的 replica shard；读请求可以从 primary shard 或 replica shard 读取，采用的是随机轮询算法
 
-![upload successful](http://blogs.xinghe.host/images/pasted-153.png)
+![upload successful](../images/pasted-153.png)
 
 - buffer：先写入内存buffer，在buffer里的时候，数据是搜索不到的，同时将数据写入translog
 
@@ -106,7 +106,7 @@ buffer 每 refresh 一次，就会产生一个segment file，所以默认情况�
 
 倒排索引就是**关键词到文档 ID 的映射**，每个关键词都对应着一系列的文件，这些文件中都出现了关键词。
 
-![upload successful](http://blogs.xinghe.host/images/pasted-154.png)
+![upload successful](../images/pasted-154.png)
 
 其实倒排索引还记录了更多的信息，比如文档频率信息，标识在文档集合中有多少个文档包含某个单词
 
@@ -126,7 +126,7 @@ buffer 每 refresh 一次，就会产生一个segment file，所以默认情况�
 
 ### 性能优化的杀手锏——filesystem cache
 
-![upload successful](http://blogs.xinghe.host/images/pasted-155.png)
+![upload successful](../images/pasted-155.png)
 
 es的搜索引擎严重依赖底层的 filesystem cache，你如果给 filesystem cache 更多的内存，尽量让内存足以容纳所有的 idx segment file 索引数据文件，那么你的搜索就全部基于内存，性能非常高
 

@@ -1,7 +1,7 @@
 ### 前言
 对于高并发服务器，线程池的实现也会提高很大的性能，因为客户端连接后就要开启线程去处理，处理结束就销毁，对于线程的开销也是性能的损耗，利用线程池来降低线程的开销
 
-![upload successful](http://blogs.xinghe.host/images/pasted-45.png)
+![upload successful](../images/pasted-45.png)
 
 线程池的数据结构：
 

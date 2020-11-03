@@ -9,7 +9,7 @@ Goroutine是一个很复杂的调度机制，下面尝试使用通俗一点的�
 
 在高并发的场景下，我们会频繁的创建和销毁线程，所以有来线程池，会减小线程切换的开销，下图一个经典的线程池：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-93.png)
+![upload successful](../images/pasted-93.png)
 <!--more-->
 为了方便下面的叙述，我们把任务队列里面的每一个任务称之为G，而G往往都代表一个函数，线程池中的worker会不断的从任务队列里面取出任务并执行，而worker线程的调度就交给操作系统
 
@@ -19,7 +19,7 @@ Goroutine是一个很复杂的调度机制，下面尝试使用通俗一点的�
 
 解决这个问题就是重新审视这个线程池，增加一部分的线程数量，但是线程数量增加，就意味这过多的线程会争抢CPU，消费能力会有上限，甚至出现消费能力下降，如下图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-94.png)
+![upload successful](../images/pasted-94.png)
 
 ## Goroutine调度器
 
@@ -32,7 +32,7 @@ Goroutine主要概念如下：
 
 M必须拥有一个P才能执行G里面的代码，而G只由P来管理（还有全局队列），P会维护一个G的队列，P可以调度G交给M执行G的代码，其关系如图所示：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-95.png)
+![upload successful](../images/pasted-95.png)
 
 图中M是交给操作系统调度的线程，M持有一个P，P将G调度进M中执行，P同时还维护这一个包含G的队列（图中灰色部分），可以按照一定的策略将G调度到M中执行
 
@@ -54,7 +54,7 @@ P的个数在程序启动的时候就决定了，默认情况下等同于cpu的�
 
 当M运行的某个G产生系统调用的时候，如下图所示：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-96.png)
+![upload successful](../images/pasted-96.png)
 
 如图所示，当G0发生系统调用的时候，M0将释放P，进而P会找到一个空闲的M1获取P，继续执行P队列剩下的G，而M0因为陷入系统调用而阻塞，M1接替M0的工作，只要P不空闲，就可以保证充分利用cpu
 
@@ -66,7 +66,7 @@ M1的来源可能是M的缓存池，也可能是新建的，当G0完成系统调
 
 多个P维护多个G的队列，就有可能任务不均衡
 
-![upload successful](http://blogs.xinghe.host/images/pasted-97.png)
+![upload successful](../images/pasted-97.png)
 
 竖线左侧中，右边的P执行完了G，就会去查询全局队列是否有G，如果有，就调度来执行，如果没有，而另一个M中除了正在运行的G之外还有3个G带运行，此时，空闲的P会将一部分G偷取一部分过来，一般每次偷取一半，偷取完如右图所示
 

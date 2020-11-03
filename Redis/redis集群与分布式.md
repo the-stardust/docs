@@ -4,7 +4,7 @@
 
 架构图如下：(图片来自孤独烟的博客)
 
-![upload successful](http://blogs.xinghe.host/images/pasted-136.png)
+![upload successful](../images/pasted-136.png)
 
 
 - 这里的sentinel就是哨兵，主要负责监控、通知与故障转移
@@ -31,7 +31,7 @@ redis官网出的，会一直维护下去，很稳定
 
 架构如下(图片来自孤独烟的博客)
 
-![upload successful](http://blogs.xinghe.host/images/pasted-137.png)
+![upload successful](../images/pasted-137.png)
 
 #### cluster的数据结构
 
@@ -57,7 +57,7 @@ redis官网出的，会一直维护下去，很稳定
 	
    建立连接的过程就是发送ping/pong包来建立连接，在各自节点上新建一个clusterNode结构添加到clusterState.nodes里面去，如下图所示“
     
-![upload successful](http://blogs.xinghe.host/images/pasted-138.png)
+![upload successful](../images/pasted-138.png)
     
 !> 所以说，集群的每个节点不是存储的全部数据，而是各个节点加起来
 
@@ -109,7 +109,7 @@ redis是定时删除+惰性删除
 
 hashMap+双向链表
 
-![upload successful](http://blogs.xinghe.host/images/pasted-139.png)
+![upload successful](../images/pasted-139.png)
 
 - 首先预先设置 LRU 的容量，如果存储满了，可以通过 O(1) 的时间淘汰掉双向链表的尾部
 - 每次新增和访问数据，都可以通过 O(1)的效率把新的节点增加到对头，或者把已经存在的节点移动到队头。

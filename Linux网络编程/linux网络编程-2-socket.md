@@ -6,14 +6,14 @@
 既然是文件，那么理所当然的，我们可以使用文件描述符引用套接字。与管道类似的，Linux系统将其封装成文件的目的是为了统一接口，使得读写套接字和读写文件的操作一致。区别是管道主要应用于本地进程间通信，而套接字多应用于网络进程间数据的传递。
 
 来描述网络连接的一对一关系。
-![upload successful](http://blogs.xinghe.host/images/pasted-38.png)
+![upload successful](../images/pasted-38.png)
 
 !>在网络通信中，套接字一定是成对出现的
 
 一端的发送缓冲区对应对端的接收缓冲区。我们使用同一个文件描述符索发送缓冲区和接收缓冲区。
 
 TCP/IP协议最早在BSD UNIX上实现，为TCP/IP协议设计的应用层编程接口称为socket API。本章的主要内容是socket API，主要介绍TCP协议的函数接口，最后介绍UDP协议和UNIX Domain Socket的函数接口。
-![upload successful](http://blogs.xinghe.host/images/pasted-39.png)
+![upload successful](../images/pasted-39.png)
 
 ## 预备知识
 
@@ -45,7 +45,7 @@ TCP/IP协议最早在BSD UNIX上实现，为TCP/IP协议设计的应用层编程
 如果主机是小端字节序，这些函数将参数做相应的大小端转换然后返回，如果主机是大端字节序，这些函数不做转换，将参数原封不动地返回。
 
 ## socket模型创建流程图
-![upload successful](http://blogs.xinghe.host/images/pasted-40.png)
+![upload successful](../images/pasted-40.png)
 
 ### socket函数
 	#include <sys/types.h> /* See NOTES */
@@ -152,7 +152,7 @@ bind()的作用是将参数sockfd和addr绑定在一起，使sockfd这个用于�
 ## C/S模型-TCP
 
 下图是基于TCP协议的客户端/服务器程序的一般流程：
-![upload successful](http://blogs.xinghe.host/images/pasted-41.png)
+![upload successful](../images/pasted-41.png)
 
 ### 连接建立过程
 服务器调用socket()、bind()、listen()完成初始化后，调用accept()阻塞等待，处于监听端口的状态，客户端调用socket()初始化后，调用connect()发出SYN段并阻塞等待服务器应答，服务器应答一个SYN-ACK段，客户端收到后从connect()返回，同时应答一个ACK段，服务器收到后从accept()返回。

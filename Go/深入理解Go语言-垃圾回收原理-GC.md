@@ -27,7 +27,7 @@ Golang的垃圾回收（GC）也是内存管理的一部分，了解垃圾回收
 
 下图展示了一段内存，内存心中既有以分配掉的内存，也有为分配的内存，垃圾回收的目标就是把哪些已经分配但是没有对象引用的内存找出来并回收掉
 
-![upload successful](http://blogs.xinghe.host/images/pasted-102.png)
+![upload successful](../images/pasted-102.png)
 
 上图中，内存块1、2、4号位上的内存块已被分配(数字1代表已被分配，0 未分配)。变量a, b为一指针，指向内存的1、2号位。内存块的4号位曾经被使用过，但现在没有任何对象引用了，就需要被回收掉。
 
@@ -36,7 +36,7 @@ Golang的垃圾回收（GC）也是内存管理的一部分，了解垃圾回收
 ### 内存标记(Mark)
 前面介绍内存分配时，介绍过span数据结构，span中维护了一个个内存块，并由一个位图allocBits表示每个内存块的分配情况。在span数据结构中还有另一个位图gcmarkBits用于标记内存块被引用情况。
 
-![upload successful](http://blogs.xinghe.host/images/pasted-103.png)
+![upload successful](../images/pasted-103.png)
 
 如上图所示，allocBits记录了每块内存分配情况，而gcmarkBits记录了每块内存标记情况。标记阶段对每块内存进行标记，有对象引用的的内存标记为1(如图中灰色所示)，没有引用到的保持默认为0.
 
@@ -52,21 +52,21 @@ allocBits和gcmarkBits数据结构是完全一样的，标记结束就是内存�
 - 黑色：对象已被标记，gcmarkBits对应的位为1（该对象不会在本次GC中被清理）
 - 白色：对象未被标记，gcmarkBits对应的位为0（该对象将会在本次GC中被清理）
 
-![upload successful](http://blogs.xinghe.host/images/pasted-104.png)
+![upload successful](../images/pasted-104.png)
 
 初始状态下都是白色
 
 接着开始扫描根对象a、b
 
-![upload successful](http://blogs.xinghe.host/images/pasted-105.png)
+![upload successful](../images/pasted-105.png)
 
 由于根对象引用到了AB，那么AB两个变色灰色，接下来开始分析灰色对象，分析A时，A没有引用其他对象迅速转成黑色，B引用了D，B转入黑色的同时把D放在标记队列中，也就是把D标记成灰色，进行接下来的分析：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-106.png)
+![upload successful](../images/pasted-106.png)
 
 上图中灰色对象只有D，由于D没有引用其他对象，所以D转入黑色，标记过程结束
 
-![upload successful](http://blogs.xinghe.host/images/pasted-107.png)
+![upload successful](../images/pasted-107.png)
 
 最终黑色的对象会被保留下来，八色对象会被回收掉
 

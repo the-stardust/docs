@@ -1,7 +1,7 @@
 
 ## 前言
 
-![upload successful](http://blogs.xinghe.host/images/pasted-4.png)
+![upload successful](../images/pasted-4.png)
 
 ## 基础配置
 
@@ -57,16 +57,16 @@
 
 - 然后，mysql默认使用的BTREE索引，并且一个大致方向是:无论怎么折腾sql，至少在目前来说，mysql最多只用到表中的一个索引。
 
-![upload successful](http://blogs.xinghe.host/images/pasted-13.png)
+![upload successful](../images/pasted-13.png)
 
 ## sql执行顺序
 
 我们手写的语句是这样的
 
-![upload successful](http://blogs.xinghe.host/images/pasted-14.png)
+![upload successful](../images/pasted-14.png)
 
 而机器读取顺序是这样的
 <!--more-->
-![upload successful](http://blogs.xinghe.host/images/pasted-15.png)
+![upload successful](../images/pasted-15.png)
 
-![upload successful](http://blogs.xinghe.host/images/pasted-16.png)
+![upload successful](../images/pasted-16.png)

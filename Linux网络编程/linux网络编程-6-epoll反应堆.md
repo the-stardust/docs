@@ -11,7 +11,7 @@
 - epoll_wait(); // 监听
 - 有客户端连接上来--->listen_fd调用acceptconn()--->将client_fd挂载到红黑树上监听其读事件--->epoll_wait()返回cfd--->cfd回调recvdata()--->将cfd摘下来监听写事件--->epoll_wait()返回cfd--->cfd回调senddata()--->将cfd摘下来监听读事件--->...--->
 
-![upload successful](http://blogs.xinghe.host/images/pasted-44.png)
+![upload successful](images/pasted-44.png)
 
     
     #include <stdio.h>

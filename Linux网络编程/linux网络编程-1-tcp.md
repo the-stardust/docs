@@ -3,7 +3,7 @@
 
 下图是一次TCP通讯的时序图。TCP连接建立断开。包含大家熟知的三次握手和四次挥手
 
-![upload successful](http://blogs.xinghe.host/images/pasted-35.png)
+![upload successful](../images/pasted-35.png)
 
 - 1.客户端发送一个带SYN标志的TCP报文到服务器。这是三次握手过程中的段1
 	 SYN是请求位，占1位，还有一个序号，在通讯中起到临时地址的作用，这个序号要加1，
@@ -41,7 +41,7 @@
 ## 滑动窗口（流量控制）
 介绍UDP时我们描述了这样的问题：如果发送端发送的速度较快，接收端接收到数据后处理的速度较慢，而接收缓冲区的大小是固定的，就会丢失数据。TCP协议通过“滑动窗口（Sliding Window）”机制解决这一问题。看下图的通讯过程：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-36.png)
+![upload successful](../images/pasted-36.png)
 
 从这个例子还可以看出，发送端是一K一K地发送数据，而接收端的应用程序可以两K两K地提走数据，当然也有可能一次提走3K或6K数据，或者一次只提走几个字节的数据。
 也就是说，应用程序所看到的数据是一个整体，或说是一个流（stream），在底层通讯中这些数据可能被拆成很多数据包来发送，但是一个数据包有多少字节对应用程序是不可见的，
@@ -52,7 +52,7 @@
 
 ## TCP状态转换
 
-![upload successful](http://blogs.xinghe.host/images/pasted-37.png)
+![upload successful](../images/pasted-37.png)
 
 - CLOSED：表示初始状态。
 - LISTEN：该状态表示服务器端的某个SOCKET处于监听状态，可以接受连接。

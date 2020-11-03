@@ -46,7 +46,7 @@
     // 此处默认文件一定存在，并且文件格式正确 例如下图
     // 第一行是迷宫行数，和列数
     
-![upload successful](http://blogs.xinghe.host/images/pasted-46.png)
+![upload successful](../images/pasted-46.png)
     
     func readMaze(filename string)[][]int{
         file, err := os.Open(filename)

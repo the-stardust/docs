@@ -23,7 +23,7 @@ MySQL Optimizer是一个专门负责优化SELECT 语句的优化器模块，它�
 
 ## 查询计划字段解析
 
-![upload successful](http://blogs.xinghe.host/images/pasted-19.png)
+![upload successful](../images/pasted-19.png)
 
 ### id
 
@@ -77,7 +77,7 @@ MySQL Optimizer是一个专门负责优化SELECT 语句的优化器模块，它�
 ### rows
 >rows列显示MySQL认为它执行查询时必须检查的行数。越少越好
 
-![upload successful](http://blogs.xinghe.host/images/pasted-20.png)
+![upload successful](../images/pasted-20.png)
 
 ### Extra
 >包含不适合在其他列中显示但十分重要的额外信息
@@ -85,23 +85,23 @@ MySQL Optimizer是一个专门负责优化SELECT 语句的优化器模块，它�
 - MySQL中无法利用索引完成的排序操作称为“文件排序”
 - 出现filesort的情况：order by 的时候使用了复合索引中的部分索引，导致生成临时表，和文件排序
 
-![upload successful](http://blogs.xinghe.host/images/pasted-21.png)
+![upload successful](../images/pasted-21.png)
 - 优化后，不再出现filesort的情况：orderBy使用了复合索引
-![upload successful](http://blogs.xinghe.host/images/pasted-22.png)
+![upload successful](../images/pasted-22.png)
 
 **查询中排序的字段，排序字段若通过索引去访问将大大提高排序速度分情况：当通过前面的查询语句 筛选大部分条件后，只剩下很少的数据。using filesort 性能影响不大。需要综合考虑**
 
 ### Using temporary
 >使了用临时表保存中间结果,MySQL在对查询结果排序时使用临时表。常见于排序 order by 和分组查询 group by。
  - 优化前：group by 的时候使用了复合索引中的部分索引，导致生成临时表，和文件排序
-![upload successful](http://blogs.xinghe.host/images/pasted-23.png)
+![upload successful](../images/pasted-23.png)
 - 优化后：
-![upload successful](http://blogs.xinghe.host/images/pasted-24.png)
+![upload successful](../images/pasted-24.png)
 
 ### USING index 
 >表示相应的select操作中使用了覆盖索引(Covering Index)，避免访问了表的数据行，效率不错！如果同时出现using where，表明索引被用来执行索引键值的查找;如果没有同时出现using where，表明索引只是用来读取数据而非利用索引执行查找。
 
-![upload successful](http://blogs.xinghe.host/images/pasted-25.png)
+![upload successful](../images/pasted-25.png)
 
 ### 覆盖索引：也叫索引覆盖
 >索引是高效找到行的一个方法，但是一般数据库也能使用索引找到一个列的数据，因此它不必读取整个行。毕竟索引叶子节点存储了它们索引的数据;当能通过读取索引就可以得到想要的数据，那就不需要读取行了。

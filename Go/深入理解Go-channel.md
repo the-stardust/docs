@@ -29,7 +29,7 @@ channel内部使用一个环形队列来作为缓冲区，队列的长度是make
 
 用一个图片表示一个缓冲区大小为6的channel
 
-![upload successful](http://blogs.xinghe.host/images/pasted-68.png)
+![upload successful](../images/pasted-68.png)
 
 1. qcount 表示现在chan里面有两个元素
 2. dataqsiz = 6 表示队列缓冲区大小为6，克放6个元素
@@ -45,7 +45,7 @@ channel内部使用一个环形队列来作为缓冲区，队列的长度是make
 
 下图展示了一个没有缓冲区的channel，有等待队列的情况
 
-![upload successful](http://blogs.xinghe.host/images/pasted-69.png)
+![upload successful](../images/pasted-69.png)
 
 1. 因为读阻塞的goroutine会被向channel中写数据的goroutine所唤醒
 2. 因为写阻塞的goroutine会被从channel中读数据的goroutine所唤醒
@@ -88,7 +88,7 @@ elemtype表示元素的类型，elemsize表示元素的大小，用于在buf中�
     
 大概流程如图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-70.png)
+![upload successful](../images/pasted-70.png)
 
 ### 从channel中读取数据
 
@@ -102,7 +102,7 @@ elemtype表示元素的类型，elemsize表示元素的大小，用于在buf中�
    
 简单流程图如下
 
-![upload successful](http://blogs.xinghe.host/images/pasted-71.png)
+![upload successful](../images/pasted-71.png)
 
 ### 关闭channel
 

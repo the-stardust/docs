@@ -196,7 +196,7 @@ defer语句中的fmt.Println()参数i在defer出现的时候就已经确定下�
 
 下图展示了多个defer被链接的过程：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-92.png)
+![upload successful](../images/pasted-92.png)
 
 从上图可以看出，新生命的defer总是在链表头部
 

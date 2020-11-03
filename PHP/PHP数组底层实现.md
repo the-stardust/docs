@@ -76,7 +76,7 @@
 
 ## 数组实现
 
-![pic](http://blogs.xinghe.host/images/pasted-156.png)
+![pic](../images/pasted-156.png)
 
 首先如图所示，讲的很明白了，
 

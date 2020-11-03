@@ -30,7 +30,7 @@ slice依托数组实现，底层数组对用户屏蔽，当底层数组容量不
 
 例如 slice := make([]int ,5,10) 创建的slice 就如下图所示
 
-![upload successful](http://blogs.xinghe.host/images/pasted-79.png)
+![upload successful](../images/pasted-79.png)
 
 长度是5，容量是10，表示后续添加元素不必重新分配内存
 
@@ -40,7 +40,7 @@ slice依托数组实现，底层数组对用户屏蔽，当底层数组容量不
 
 slice := array[5:7]
 
-![upload successful](http://blogs.xinghe.host/images/pasted-80.png)
+![upload successful](../images/pasted-80.png)
 切片从数组array[5]开始，到数组array[7]结束（不含array[7]），即切片长度为2，数组后面的内容都作为切片的预留内存，即capacity为5。
 
 >数组和切片操作可能作用于同一块内存，这也是使用过程中需要注意的地方。
@@ -51,7 +51,7 @@ slice := array[5:7]
 
 例如一个cap为5的，切len也为5的slcie再追加元素的时候，就会发生扩容，如图
 
-![upload successful](http://blogs.xinghe.host/images/pasted-81.png)
+![upload successful](../images/pasted-81.png)
 
 扩容操作只关心容量，会把元slice拷贝到新的slice，**追加数据由扩容后完成**，扩容后slice长度仍然是5，但是容量变成了10，原来slice的数据也被拷贝进了新的slice，然后追加新数据
 

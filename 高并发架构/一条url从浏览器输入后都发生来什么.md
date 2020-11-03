@@ -10,9 +10,9 @@
 
 2. DNS分为好几级，会进行递归查询，如下图：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-125.png)
+![upload successful](../images/pasted-125.png)
 
-![upload successful](http://blogs.xinghe.host/images/pasted-126.png)
+![upload successful](../images/pasted-126.png)
 
 3. 现在本地DNS服务器查找，如果本地有DNS缓存会直接返回ip地址
 
@@ -32,7 +32,7 @@
 
 建立tcp连接要经过三次握手，首先服务器肯定要处于监听的状态 listen
 
-![upload successful](http://blogs.xinghe.host/images/pasted-131.png)
+![upload successful](../images/pasted-131.png)
 
 1. 客户端发送包含syn=1，seq=x 到syn数据包给服务器，这是第一次握手，客户端现在的状态变为syn_send
 2. 服务端接收到syn数据包之后，如果没有什么问题，就发送一个包含syn=1,seq=y,ack=1,acknum=x+1的 syn/ack数据包给客户端，这是服务端的状态变为 syn_rcvd
@@ -46,11 +46,11 @@
 
 >如果使用https协议的花，还要进行tls/ttl协议的验证，证书验证等，有兴趣的同学自己可以查询相关知识
 
-![upload successful](http://blogs.xinghe.host/images/pasted-128.png)
+![upload successful](../images/pasted-128.png)
 
 下图展示一次完成的http请求过程
 
-![upload successful](http://blogs.xinghe.host/images/pasted-129.png)
+![upload successful](../images/pasted-129.png)
 
 1. 首先进入http协议的包装，请求行包含请求方法、url、http版本等信息，请求头部会附加一些比如host、user-agent、connection属性等等，当请求方法为post的时候会携带请求数据，当请求方法为get的时候没有请求数据部分，
 2. 然后发送到tcp协议层，tcp协议会为数据包添加tcp首部，包含源端口号和目的端口号等信息
@@ -98,7 +98,7 @@ tcp四次挥手阶段，客户端和服务端都可以主动关闭tcp连接，�
 
 这里暂定客户端为主动关闭，服务端为被动关闭，其实都一样的
 
-![upload successful](http://blogs.xinghe.host/images/pasted-130.png)
+![upload successful](../images/pasted-130.png)
 
 1. 客户端主动关闭，发送fin=1，seq=x的数据包，然后状态变成fin_wait1
 
