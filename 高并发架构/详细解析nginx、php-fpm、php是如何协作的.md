@@ -27,13 +27,24 @@ cgi程序的工作模式为：
 
 fastcgi工作模式：
 
-- fastcgi程序，会先fork一个master，解析配置文件，初始化执行环境，然后再fork多个worker，当一个请求过来，挑选一个空闲的进程来处理请求，请求结束之后，不销毁进程，而是放回原来的进程池中，等待接收其他的请求
-
+- fastcgi程序，会先fork一个master，解析配置文件，初始化执行环境，然后再fork多个worker，~~当一个请求过来，挑选一个空闲的进程来处理请求，请求结束之后，不销毁进程，而是放回原来的进程池中，等待接收其他的请求~~
+!> worker是一直在accept()获取cgi的请求，进行处理,不是master挑选空闲的worker去处理
+- master通过共享内存获取worker的信息，比如worker进程当前状态、已处理请求数等
+- master通过信号来操纵worker，比如杀死worker
 - 当空闲的worker太多的时候，会杀死一些worker，反之当worker不够用的时候，会临时增加一定量的worker来处理请求，但不是无限量的增加，会有一个顶峰值
 
 ## php-fpm
 
 >php-fpm就是实现来fastcgi协议的进程管理工具
+
+工作内容就是：
+
+1. 等待请求: worker进程阻塞在fcgi_accept_request()等待请求
+2. 解析请求： fastcgi请求到达后被worker接收，然后开始接收并解析请求数据，直到request数据完全到
+3. 请求初始化： 执行php_request_startup()，此阶段会调用每个扩展的：PHP_RINIT_FUNCTION()
+4. 编译、执行： 由php_execute_script()完成PHP脚本的编译、执行(这一步就是我们执行我们写的php代码了)
+5. 关闭请求： 请求完成后执行php_request_shutdown()，此阶段会调用每个扩展的：PHP_RSHUTDOWN_FUNCTION()，然后进入步骤1
+
 
 ### php-fpm常用配置
 

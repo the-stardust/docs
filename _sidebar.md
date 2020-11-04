@@ -10,6 +10,7 @@
 * PHP
 ** [PHP数组底层实现](PHP/PHP数组底层实现.md)
 ** [PHP生命周期](PHP/PHP生命周期.md)
+** [PHP内存管理](PHP/PHP内存管理.md)
 * Go
 ** [Channel](Go/深入理解Go-channel.md)
 ** [Map](Go/深入理解Go-Map.md)
