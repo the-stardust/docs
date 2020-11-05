@@ -118,6 +118,13 @@ PHP7和PHP5.3都是用的是引用计数的方式进行GC
 2. 不会再有两次计数的情况，在对象中，只有对象自身存储的计数是有效的
 3. 由于现在计数由数值自身存储，所以也就可以和非zval结构的数据共享，比如zval和hashTable key之间
 
+当一个数字类型或者静态字符串产生&引用之前，他的refcount一直是0，因为简单类型的值直接存储在value里面，也不会产生写时复制，当$b = $a 的时候回直接开辟一个新的zen_struct ，他的value保存这个值，不会产生引用
+
+但是当产生&引用的时候，PHP就会申请一个zend_refcounted_h结构，指向原来的value，然后value的类型被修改为zend_refrence，新变量申请zval_struct 他的value指向这个zend_refcounted_h
+
+所有的复杂类型的定义, 开始的时候都是zend_refcounted_h结构, 
+这个结构里除了引用计数以外, 还有GC相关的结构. 从而在做GC回收的时候, GC不需要关心具体类型是什么, 所有的它都可以当做zend_refcounted*结构来处理.
+
 ### copy on write
 
 PHP写时复制
