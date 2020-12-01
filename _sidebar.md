@@ -7,6 +7,8 @@
 ** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
 ** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
 ** [一条url从浏览器输入后都发生来什么](高并发架构/一条url从浏览器输入后都发生来什么.md)
+* Kubernetes
+** [学习笔记-容器](Kubernetea/学习笔记-容器.md)
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
 ** [PHP内存管理](PHP/PHP内存管理.md)
@@ -29,6 +31,7 @@
 ** [主从复制](Mysql/mysql-主从复制.md)
 ** [索引数据结构](Mysql/Mysql索引为什么用B-树而不是平衡二叉树.md)
 ** [慢sql分析](Mysql/分析为什么一条sql执行很慢.md)
+** [MVCC实现原理](Mysql/MVCC实现原理.md)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
 ** [底层数据结构](Redis/redis-跳跃表.md)

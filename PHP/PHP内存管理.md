@@ -1,5 +1,4 @@
 ## 概述
-
 1. 操作系统直接管理着内存，所以操作系统也需要内存管理，计算机中通常都有内存管理单元(MMU)用于处理cpu对内存的访问
 2. 应用程序无法直接调用物理内存，只能向OS申请，向OS申请内存，会引发系统调用，系统调用会把cpu从用户态切换到内核态
 3. 为了减少系统调用开销,通常在用户态就对内存进行管理，使用完内存不立即返回给OS，而是复用，避免每次内存释放和申请带来开销
@@ -14,11 +13,8 @@
             memory_get_peak_usage() ：返回当前脚本到目前位置所占用的内存峰值。
     
 ## PHP的内存管理
-
-![](https://upload-images.jianshu.io/upload_images/263175-116fa0f4acf9111a.png?imageMogr2/auto-orient/strip|imageView2/2/w/625/format/webp)
-
+![pic](../images/263175-116fa0f4acf9111a.png)
 ### 接口层
-
 是一些宏定义
 
 ### 堆层 
@@ -54,7 +50,7 @@ ZendMM向OS进行内存申请，首先ZendMM的最底层heap层先向OS申请一
 6. 内存分配完毕，对zend_mm_heap结构中的各种标识型变量进行维护，包括large_free_buckets、peak、size等
 7. 返回分配的内存地址
 
-![](https://upload-images.jianshu.io/upload_images/263175-6e8b09aa1b85d27b.png?imageMogr2/auto-orient/strip|imageView2/2/w/504/format/webp)
+![](../images/263175-6e8b09aa1b85d27b.png)
 
 ## 内存的销毁
 
@@ -112,10 +108,10 @@ struct _zval_struct {
 
 PHP7和PHP5.3都是用的是引用计数的方式进行GC
 
-但是PHP7对zval进行了结构上的优化，*zval需要的内存不再从堆上分配，不再自己存储引用计数，复杂数据类型(字符串、数组、对象)的引用计数由其自身来存储，这种实现的好处是：
-
+但是PHP7对zval进行了结构上的优化，*zval需要的内存不再从堆上分配，
 1. 简单的数据类型不需要单独分配呢村，也不需要计数
-2. 不会再有两次计数的情况，在对象中，只有对象自身存储的计数是有效的
+2. 不会再有两次计数的情况，在对象中，只有对象自身存不再自己存储引用计数，复杂数据类型(字符串、数组、对象)的引用计数由其自身来存储，这种实现的好处是：
+储的计数是有效的
 3. 由于现在计数由数值自身存储，所以也就可以和非zval结构的数据共享，比如zval和hashTable key之间
 
 当一个数字类型或者静态字符串产生&引用之前，他的refcount一直是0，因为简单类型的值直接存储在value里面，也不会产生写时复制，当$b = $a 的时候回直接开辟一个新的zen_struct ，他的value保存这个值，不会产生引用
