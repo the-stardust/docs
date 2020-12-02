@@ -1,16 +1,17 @@
-## 原理
-- 1.master将改变记录到二进制日志（binary log）。这些记录过程叫做二进制日志事件，binary log events
-- 2.slave将master的binary log events拷贝到它的中继日志（relay log）
-- 3.slave重做中继日志中的事件，将改变应用到自己的数据库中。 MySQL复制是异步的且串行化的
+## 主从复制原理
+
+涉及三个线程：
+1. binlog线程：负责把主服务器上的数据更改写入到二进制日志(binary log)中
+2. I/O线程：负责从主服务器上读取二进制日志，并写入到从服务器的中继日志(relay log)中
+3. SQL线程：负责读取中继日志，即系出主服务器已经执行的数据更改并在从服务器中重放(Replay)
+
 
 ## 复制的基本原则
-1.每个slave只有一个master
 
-2.每个slave只能有一个唯一的服务器ID
-
-3.每个master可以有多个salve
-
-4.复制的最大问题就是数据延迟，高并发状态下，刚写入的数据会读取不到，因为slave同步数据会有延时
+1. 每个slave只有一个master
+2. 每个slave只能有一个唯一的服务器ID
+3. 每个master可以有多个salve
+4. 复制的最大问题就是数据延迟，高并发状态下，刚写入的数据会读取不到，因为slave同步数据会有延时
 
 ### 有三种同步机制
 	
@@ -21,47 +22,48 @@
 	
 - 全同步复制：指当主库执行完一个事务，所有的从库都执行了该事务才返回给客户端。因为需要等待所有从库执行完该事务才能返回，所以全同步复制的性能必然会
     
-## 主从配置
-### 1.要求
-- mysql版本一致且后台以服务运行
-- 主从都配置在[mysqld]结点下，都是小写
+## 读写分离
+主服务器处理写操作以及实时性要求比较高的读操作，而从服务器处理读操作。
 
-### 2.主机修改配置
+读写分离能提高性能的原因在于：
 
-- **（1）[必须]主服务器唯一ID server-id=1**
-- **（2）[必须]启用二进制日志 log-bin=自己本地的路径/data/mysqlbin**
-- （3）[可选]启用错误日志 log-err=自己本地的路径/data/mysqlerr
-- （4）[可选]根目录 basedir="自己本地路径"
-- （5）[可选]临时目录 tmpdir="自己本地路径"
-- （6）[可选]数据目录 datadir="自己本地路径/Data/"
-- （7）read-only=0 主机，读写都可以
-- （8）[可选]设置不要复制的数据库 binlog-ignore-db=mysql
-- （9）[可选]设置需要复制的数据库 binlog-do-db=需要复制的主数据库名字 默认全部复制
+- 主从服务器负责各自的读和写，极大程度缓解了锁的争用；
+- 从服务器可以使用 MyISAM，提升查询性能以及节约系统开销；
+- 增加冗余，提高可用性。
 
-### 3.从机修改配置
+> 读写分离常用代理方式来实现，代理服务器接收应用层传来的读写请求，然后决定转发到哪个服务器。
 
-- **（1）[必须]从服务器唯一ID**
--  （2）[可选]启用二进制日志
+## 主从延迟
 
-### 4.关闭虚拟机linux防火墙 
+1. master的TPS较高，产生大量binlog，slave的sql线程承受不住，那么延时就产生了
+2. 大型sql卡主了，slave是单线程，所以会阻塞
 
-   关闭虚拟机linux防火墙 service iptables stop，因修改过配置文件，请主机+从机都重启后台mysql服务
-    
-### 5.主机授权从机
+### 如何判断主从是否延迟了
 
-- **（1）GRANT REPLICATION SLAVE ON *.* TO 'zhangsan'@'从机器数据库IP' IDENTIFIED BY '密码';**
-- （2）flush privileges; 刷新权限
-- （3）show master status; 查询master的状态 记录下File和Position的值
-- （4）**执行完此步骤后不要再操作主服务器MYSQL，防止主服务器状态值变化**
+1. 通过show slave status\G命令输出的Seconds_Behind_Master参数的值来判断 
+    null：表示 io线程或者sql线程有任何一个发生故障
+    0：没有延迟
+    正值：值越大表示延迟越高，落后主库越多
+>但是这个是不太准的，因为Seconds_Behind_Master是比较sql线程和io线程的event的timestamp，得到的差值
+>但是如果master上网络阻塞很大，导致不能及时吧binlog同步到relay log中，但是sql线程可以及时同步relay log
+>到本地重放，此时Seconds_Behind_Master就是为0，但其实已经产生延迟了
 
-### 配置从机
+2. mk-heartbeat，Maatkit万能工具包中的一个工具，被认为可以准确判断复制延时的方法。
 
-- CHANGE MASTER TO MASTER_HOST='192.168.124.3',MASTER_USER='zhangsan',MASTER_PASSWORD='123456',MASTER_LOG_FILE='mysqlbin.具体数字',MASTER_LOG_POS=具体值;
-- start slave;
-- show slave status\G\
-    下面两个参数都是Yes，则说明主从配置成功！
-      Slave_IO_Running: Yes
-      Slave_SQL_Running: Yes
-      
-    
-- stop slave; 停止复制
+
+### 问题产生的原因
+
+1. 因为主从同步使用的是binlog，binlog是顺序写，效率很高
+2. slave的I/O线程读取binlog写到relay log中，效率也比较高
+3. 问题就产生在slave的sql线程，因为binlog里面记录的ddl、dml的I/O操作都是随机的，成本就高很多，并且slave还有可能
+跟本机上的其他查询产生lock竞争，因为sql线程是单线程，所以一个ddl卡主了，执行了10分钟时间，那么之后的ddl都会阻塞
+4. 主库的ddl也执行了10分钟为什么不会卡主，是因为master是有并发的，slave的sql线程是单线程
+
+### 解决方案
+
+1. 架构上的优化，不要产生大型sql，salve的sql线程是单线程，会卡住
+2. 主库会有写操作，需要较高的安全性，比如 sync_binlog = 1，innodb_flush_log_at_trx_commit = 1等设置都会拖慢机器
+而slave的安全性就没必要这么高，甚至可以关闭binlog，innodb_flushlog也可以关闭来提高sql执行效率
+3. 使用硬件提示slave
+
+!> mysql-5.6.3已经支持了多线程的主从复制,但是TPS太高也会拖慢速度
