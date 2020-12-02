@@ -19,24 +19,32 @@
 ### 为什么这么设计
 
 - 可以直接获取字符串的长度，不需要像c语言一样遍历字符串得到长度，时间复杂度O(1)
-- 杜绝缓冲区溢出，利用free如果free长度不足，字符串发生自动扩容整个buf
+- 杜绝缓冲区溢出，利用free,如果free长度不足，字符串发生自动扩容整个buf
 - 减少修改字符串长度时造成的内存再分配
 	redis是典型的用空间换时间的数据库，sds使用free将字符串长度和底层buf长度关系解除了，buf长度也不是字符串长度，基于这个设计了sds的空间预分配和惰性释放
-    1. 预分配
+    1. 预分配 
+        当len小于1mb的时候，free与len相同，比如len为13字节，free也是13字节，buf实际长度为13+13=1 = 27字节(保存空字符的1字节空间不计算在len属性内) 
+        当len大于1mb的时候，free只有1mb，比如len为30mb，free就是1mb，总长度为30mb+1mb+1byte
     2. 惰性释放
+        字符串修改后，释放的空间放入free保存起来，不返还，等待使用，避免了频繁的内存重分配
 - 二进制安全
+    C字符串以空字符\0结尾，使得 C 字符串只能保存文本数据， 而不能保存像图片、音频、视频、压缩文件这样的二进制数据
 - 兼容c语言
-
+- SDS利用len来判断是否结束，而不是空字符\0
+![pic](../images/20200102113458.png)
+    
 ## 链表
 
-      typedef struct listNode {
-        // 前置节点
-        struct listNode *prev;
-        // 后置节点
-        struct listNode *next;
-        // 节点的值
-        void *value;
-      } listNode;
+```
+typedef struct listNode {
+// 前置节点
+struct listNode *prev;
+// 后置节点
+struct listNode *next;
+// 节点的值
+void *value;
+} listNode;
+```
     
 ![upload successful](../images/pasted-109.png)
 
@@ -64,7 +72,7 @@ dictht的插入：
 - 计算key的hash值，找到hash映射的table数组的位置
 - 如果此位置没有数据直接存储到这里，有数据的话，会生成一个新节点挂在之前的节点的next指针后面
 - 如果key发生了多次碰撞，造成了链表的长度越来越长，使得字典的查询越来越慢，redis会对字典进行rehash
-	- 其中有一个负载因子的概念，当负载因子大于1（此处不确定）的时候发生rehash
+	- 其中有一个负载因子的概念，当负载因子大于1（此处不确定）的时候发生rehash，负载因子 = 哈希表已保存节点数量 / 哈希表大小 load_factor = ht[0].used / ht[0].size
 	- rehash 会根据ht[0]的数据和操作类型，为ht[1]分配内存
     - 将ht[0]的数据rehash到ht[1]上面
     - rehash完成之后，将ht[1]设置成ht[0]，生成一个新的ht[1]备用
@@ -76,11 +84,11 @@ dictht的插入：
 
 这样保证数据能够平滑的进行 rehash。防止 rehash 时间过久阻塞线程。
 
->在进行rehash的时候，对自带呢的update和delete操作会在两个ht上面进行，如果是find的话，现在ht[0]珊瑚进行，没找到再去ht[1]查找，insert操作会在ht[1]中进行，这样就会保证ht[0]在不断减少,ht[1]在不断增加
+>在进行rehash的时候，对自带的update和delete操作会在两个ht上面进行，如果是find的话，先在ht[0]上进行查找，没找到再去ht[1]查找，insert操作会在ht[1]中进行，这样就会保证ht[0]在不断减少,ht[1]在不断增加
 
 ## 整数集合
-
-    typedef struct intset {
+```
+typedef struct intset {
         // 编码方式
         uint32_t encoding;
         // 集合包含的元素数量
@@ -88,6 +96,7 @@ dictht的插入：
         // 保存元素的数组
         int8_t contents[];
     } intset;
+```
     
 >其实 intset 的数据结构比较好理解。一个数据保存元素，length 保存元素的数量，也就是contents的大小，encoding 用于保存数据的编码方式。    
     
@@ -99,89 +108,7 @@ dictht的插入：
 
 ## 跳跃表
 
->重头戏来了，跳跃表skiplist是链表的一种，利用空间换时间，跳表的添加、删除、查找支持O(logN)复杂度，最坏为O(N)的复杂度
-
-### 数据结构
-
-跳表是由一个zskiplist 和 多个 zskiplistNode 组成。我们先看看他们的结构：
-
-    /*
-     * 跳跃表节点
-     */
-    typedef struct zskiplistNode {
-        
-        robj *obj;// 成员对象
-        double score;// 分值
-        struct zskiplistNode *backward; // 后退指针
-        // 层
-        struct zskiplistLevel {
-            struct zskiplistNode *forward;// 前进指针
-            unsigned int span;// 跨度
-        } level[];
-    } zskiplistNode;
-    /*
-     * 跳跃表
-     */
-    typedef struct zskiplist {
-        struct zskiplistNode *header, *tail; // 表头节点和表尾节点
-        unsigned long length;// 表中节点的数量
-        int level;// 表中层数最大的节点的层数
-    } zskiplist;
-    
-可以画出结构图
-
-![upload successful](../images/pasted-112.png)
-
-其实跳表就是一个利用空间换时间的数据结构，利用 level 作为链表的索引。
-
-之前有人问过 Redis 的作者 为什么使用跳跃表，而不是 tree 来构建索引？作者的回答是：
-
-- 省内存，实现简单。
-- 服务于 ZRANGE 或者 ZREVRANGE 是一个典型的链表场景。时间复杂度的表现和平衡树差不多。
-- 最重要的一点是跳跃表的实现很简单就能达到 O(logN)的级别。
-
-!> redis中唯一使用skiplist中的数据结构就是zset
-
-!> 在redis的源码中，作者为了满身redis的要求，对skiplist进行了修改
-
-- 运行重复的score值，多个不同的member的score可以相同，当score相同根据member里面的字典序来排名（字母顺序）
-- 进行对比的时候，不仅仅对比score，也要对比member 
-- 每个节点都带有一个后退指针 *backward，用来处理从表尾方向向表头方向的遍历，比如ZREVRANGE 或 ZREVRANGEBYSCORE 指令
-
-#### 创建
-zskiplist的创建时间复杂度为O(1),头节点不是一个有效节点，有32层，高版本可能是64层，每层的foward指针指向该层跳跃表的第一个节点，没有则为null
-
-![upload successful](../images/pasted-113.png)
-
-#### 插入
-
-时间复杂度O(logn)
-
-流程大概为：
-1. 找到合适的位置
-2. 随机获得一个层数
-3. 根据层数、score、member创建一个节点
-4. 修改插入位置前后节点以及插入节点本身的backword、foreward、span等属性（可能影响前后节点每一层）
-
-#### 删除 
-
-释放一个节点内存：时间复杂度O(1)
-释放整个skiplist内存：时间复杂度O(n)
-从skiplist中删除并释放掉一个节点:时间复杂度O(logn),分为三部分
-- 根据member(obj)和score找到节点的位置（代码里变量x即为该节点，update记录每层x的上一个节点）
-- 调动zslDeleteNode把x节点从skiplist逻辑上删除
-- 释放x节点内存
-
-#### 查找
-
-1. rank范围查找
-	- 调用zslGetElementByRank找到排名start+1的节点·······O(logn)
-	- 从这个节点开始遍历(end-start+1)个节点·······O(m)
-2. score范围查找
-	- 调用zslParseRange把客户端传过来的范围min、max转换成zrangespec区间类型 保存在range变量里。
-	- 调用zslFirstInRange找到zskiplist中满足range条件的最小节点。(假设是正序的范围查找）·······O(logn)
-	- 从这个节点开始遍历，直到调用zslValueLteMax()找到最后一个小于range条件上界的节点。·······O(m)
-3. member范围查找
+[跳跃表详解](/Redis/redis-跳跃表.md)
 
 ## 压缩列表
 
