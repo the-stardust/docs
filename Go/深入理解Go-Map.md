@@ -32,32 +32,34 @@ map数据结构有src/runtime/map.go 中的hmap定义
 
 此map含有四个bucket， hmap.B = 2, 元素经过哈希函数运算过后会落到其中一个bucket中进行存储，查找过程类似
 
-bucket很多时候被翻译为桶，所谓的**哈希桶**，时间上就是bucket
+bucket很多时候被翻译为桶，所谓的**哈希桶**，实际上就是bucket
 
 ## bucket的数据结构
 
 	type bmap struct {
       
-        tophash [bucketCnt]uint8    // //存储哈希值的高8位
+        tophash [bucketCnt]uint8    // 存储哈希值的高8位
       
     }
 
 每个bucket可以存储8个键值对
 - tophash是个长度为8的数组，哈希值相同（准确的说是哈希值低位相同）存入当前bucket时会将哈希值的高位存储在数组中，以便以后匹配
-- key-value数据，存放顺序是key/key/key/...value/value/value，如此存放是为了节省字节对齐带来的空间浪费（这点我也不懂）
+- key-value数据，存放顺序是key/key/key/...value/value/value，如此存放是为了节省字节对齐带来的空间浪费
 
 下图展示bucket存储8个key-value：
 ![upload successful](../images/pasted-73.png)
 
 ## 哈希冲突
 
-当有两个或以上数量的键被哈希到同一个bucket中，就是发生了哈希冲突，go语言是利用链表法来解决哈希冲突的，由于每个bucket可以存储8个key-value，所以同一个bucket存放超过8个key-value的时候，就会再次创建一个bucket，用类似链表的方式将bucket串联起来
+当有两个或以上数量的键被哈希到同一个bucket中，就是发生了哈希冲突，go语言是利用链表法来解决哈希冲突的，
+由于每个bucket可以存储8个key-value，所以同一个bucket存放超过8个key-value的时候，就会再次创建一个bucket，用类似链表的方式将bucket串联起来
 
 下图展示发生哈希冲突后的map：
 
 ![upload successful](../images/pasted-74.png)
 
-bucket的数据结构指示下一个bucket的指针成为overflow bucket，意为当前bucket溢出的部分，事实上哈希冲突不是什么好事，好的哈希算法可以保证哈希值的随机性，避免冲突过多，冲突过多就会进行扩容
+bucket的数据结构指向下一个bucket的指针成为overflow bucket，意为当前bucket溢出的部分，
+事实上哈希冲突不是什么好事，好的哈希算法可以保证哈希值的随机性，避免冲突过多，冲突过多就会进行扩容
 
 ## 负载因子
 
@@ -65,13 +67,15 @@ bucket的数据结构指示下一个bucket的指针成为overflow bucket，意�
 	
     负载因子 = 所有键数量 / bucket数量
     
-对于一个bucket树立等于4 包含4个键值的哈希表来说，负载因子就等于1
+对于一个bucket数量等于4 包含4个键值的哈希表来说，负载因子就等于1
 
 哈希表需要将负载因子控制在合适的大小，超过设定的阀值，就会进行rehash
 - 哈希因子过小，说明空间利用率低
 - 哈希因子过大，说明冲突严重
 
-每个哈希表的实现对负载因子容忍程度不同，比如redis中实现负载因子大于1的时候，就会触发rehash，而**Go语言负载因子超过6.5的时候，才会rehash**，因为Go语言的bucket可以存储8个key-value，而redis每个bucket只能存储一个key-value，所以Go可以容忍更高的负载因子
+每个哈希表的实现对负载因子容忍程度不同，比如redis中实现负载因子大于1的时候，就会触发rehash，
+而**Go语言负载因子超过6.5的时候，才会rehash**，因为Go语言的bucket可以存储8个key-value，
+而redis每个bucket只能存储一个key-value，所以Go可以容忍更高的负载因子
 
 ## 渐进式扩容
 
@@ -83,19 +87,22 @@ bucket的数据结构指示下一个bucket的指针成为overflow bucket，意�
 
 ### 增量扩容
 
-当负载因子过大的时候， 就会新建一个bucket，新的bucket的大小是原来的两倍，考虑如果mao存储了数以亿计的key-value，一次性搬迁会造成比较大的延时，所以每次访问map时会触发搬迁，每次搬迁只会搬迁2个key-value
+当负载因子过大的时候， 就会新建一个bucket，新的bucket的大小是原来的两倍，考虑如果map存储了数以亿计的key-value，
+一次性搬迁会造成比较大的延时，所以每次访问map时会触发搬迁，每次搬迁只会搬迁2个key-value
 
 下图展示了包含一个bucket满载的map(为了描述方便，图中bucket省略了value区域):
 
 ![upload successful](../images/pasted-75.png)
 
-当前map存储了7个key-value，只有一个bucket，此时的负载因子是7，当再次发生冲突的时候，就会发生扩容现象，扩容之后再将新插入的键插入新的bucket
+当前map存储了7个key-value，只有一个bucket，此时的负载因子是7，当再次发生冲突的时候，就会发生扩容现象，
+扩容之后再将新插入的键插入新的bucket
 
 当第8个key-value插入的时候，将会发生扩容，如图所示
 
 ![upload successful](../images/pasted-76.png)
 
-hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请的bucket，新的key-value被插入到了新的bucket中，后续对map的访问操作会触发迁移，将oldbuckets中的key-value慢慢搬迁到新的bucket中，直到搬迁完毕，删除oldbuckets
+hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请的bucket，新的key-value被插入到了新的bucket中，
+后续对map的访问操作会触发迁移，将oldbuckets中的key-value慢慢搬迁到新的bucket中，直到搬迁完毕，删除oldbuckets
 
 搬迁完成如图所示
 
@@ -105,7 +112,9 @@ hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请�
 
 ### 等量扩容
 
-所谓等量扩容，实际上不是扩大容量，是一种类似增量扩容的搬迁操作，因为有一种情况是，不断的增删，而键值对正好集中在一小部分的bucket，这样会造成overflow的bucket非常的多，而每个bucket又很稀疏，负载因子就会偏小，无法进行增量扩容，如下图所示
+所谓等量扩容，实际上不是扩大容量，是一种类似增量扩容的搬迁操作，因为有一种情况是，不断的增删，
+而键值对正好集中在一小部分的bucket，这样会造成overflow的bucket非常的多，而每个bucket又很稀疏，
+负载因子就会偏小，无法进行增量扩容，如下图所示
 
 ![upload successful](../images/pasted-78.png)
 
@@ -116,12 +125,12 @@ hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请�
 查找过程如下：
 1. 根据key值计算出哈希值
 2. 取哈希值的低位，与hmap.B取模确定bucket的位置
-3. 去哈希值的高位在tophash中查找
+3. 取哈希值的高位在tophash中查找
 4. 如果tophash[i]中存储的值也哈希值相等，则去找改bucket中与key值比较，
 5. 当前bucket中没找到，就去下个overflow的bucket中查找
 6. 如果此时map处在搬迁的过程中，则优先从oldbuckets中查找
 
-**注：** 如果查找不到，也不会返回空值，而是返回当前类型的0值
+!> 如果查找不到，也不会返回空值，而是返回当前类型的0值
 
 ## 插入过程
 
