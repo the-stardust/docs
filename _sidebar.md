@@ -1,3 +1,5 @@
+* 算法
+** [回溯算法](leetcode/回溯.md)
 * 高并发架构
 ** [消息队列](高并发架构/消息队列.md)
 ** [ElasticSearch](高并发架构/搜索引擎-ES.md)
@@ -32,6 +34,7 @@
 ** [索引数据结构](Mysql/Mysql索引为什么用B-树而不是平衡二叉树.md)
 ** [慢sql分析](Mysql/分析为什么一条sql执行很慢.md)
 ** [MVCC实现原理](Mysql/MVCC实现原理.md)
+** [索引下推](Mysql/索引下推.md)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
 ** [底层数据结构](Redis/redis-底层数据结构.md)
@@ -45,3 +48,4 @@
 ** [I/O多路复用](Linux网络编程/linux网络编程-4-多路I-O复用.md)
 ** [Epoll反应堆](Linux网络编程/linux网络编程-6-epoll反应堆.md)
 ** [线程池](Linux网络编程/linux网络编程-7-线程池.md)
+** [linux系统学习笔记](Linux网络编程/linux系统.md)
