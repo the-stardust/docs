@@ -30,6 +30,7 @@
 ** [MVCC实现原理](Mysql/MVCC实现原理.md)
 ** [索引下推](Mysql/索引下推.md)
 ** mysql日志redo undo binlog(未完成)
+** 索引的行存储与行列混存(未完成)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
 ** [底层数据结构](Redis/redis-底层数据结构.md)
@@ -39,6 +40,8 @@
 ** Redis的事件模型(未完成)
 ** [延迟队列](Redis/手写redis延时队列.md)
 ** [Redis缓存失效](Redis/redis缓存击穿、雪崩、穿透.md)
+* memchache
+** memchache(未完成)
 * Linux网络编程
 ** [Tcp](Linux网络编程/linux网络编程-1-tcp.md)
 ** [Socket](Linux网络编程/linux网络编程-2-socket.md)
@@ -52,8 +55,8 @@
 ** [消息队列](消息队列/消息队列.md)
 * Zookeeper
 ** Zookeeper学习笔记(未完成)
-* Kubernetes
-** [学习笔记-容器](Kubernetea/学习笔记-容器.md)
+* Kubernetes&docker
+** [学习笔记-docker](Kubernetea/学习笔记-容器.md)
 * ElasticSearch
 ** [ElasticSearch](高并发架构/搜索引擎-ES.md)
 * Git
