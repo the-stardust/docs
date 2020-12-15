@@ -2,12 +2,13 @@
 ** [二叉树的迭代与递归遍历](leetcode/二叉树的遍历.md)
 ** [数组和链表排序](leetcode/数组排序.md)
 ** [回溯算法](leetcode/回溯.md)
-** 贪心算法
-** 动态规划与背包问题
+** 贪心算法(未完成)
+** 动态规划与背包问题(未完成)
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
 ** [PHP内存管理](PHP/PHP内存管理.md)
 ** [PHP内核之HashTable](PHP/PHP数组底层实现.md)
+** [PHP内核之Zval](未完成)
 * Go
 ** [Channel](Go/深入理解Go-channel.md)
 ** [Map](Go/深入理解Go-Map.md)
@@ -28,13 +29,14 @@
 ** [慢sql分析](Mysql/分析为什么一条sql执行很慢.md)
 ** [MVCC实现原理](Mysql/MVCC实现原理.md)
 ** [索引下推](Mysql/索引下推.md)
-** mysql日志redo undo binlog
+** mysql日志redo undo binlog(未完成)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
 ** [底层数据结构](Redis/redis-底层数据结构.md)
 ** [详解redis跳跃表](Redis/redis-跳跃表.md)
 ** [持久化](Redis/redis-持久化.md)
 ** [集群与分布式](Redis/redis集群与分布式.md)
+** Redis的事件模型(未完成)
 ** [延迟队列](Redis/手写redis延时队列.md)
 ** [Redis缓存失效](Redis/redis缓存击穿、雪崩、穿透.md)
 * Linux网络编程
@@ -45,9 +47,11 @@
 ** [线程池](Linux网络编程/linux网络编程-7-线程池.md)
 ** [linux系统学习笔记](Linux网络编程/linux系统.md)
 * 消息队列
-** Kafka学习笔记
-** RabbitMq学习笔记
+** Kafka学习笔记(未完成)
+** RabbitMq学习笔记(未完成)
 ** [消息队列](消息队列/消息队列.md)
+* Zookeeper
+** Zookeeper学习笔记(未完成)
 * Kubernetes
 ** [学习笔记-容器](Kubernetea/学习笔记-容器.md)
 * ElasticSearch
@@ -60,5 +64,6 @@
 ** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
 ** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
 ** [一条url从浏览器输入后都发生来什么](高并发架构/一条url从浏览器输入后都发生来什么.md)
-** 设计一个秒杀系统
-** 限流、降级、熔断
+** 设计一个秒杀系统(未完成)
+** 限流、降级、熔断(未完成)
+** 数据库分布式全局唯一id算法(未完成)
