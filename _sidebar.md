@@ -1,17 +1,9 @@
 * 算法
-** [回溯算法](leetcode/回溯.md)
 ** [二叉树的迭代与递归遍历](leetcode/二叉树的遍历.md)
-* 高并发架构
-** [消息队列](高并发架构/消息队列.md)
-** [ElasticSearch](高并发架构/搜索引擎-ES.md)
-** [分布式事务](高并发架构/分布式事务.md)
-** [分布式锁](高并发架构/分布式锁.md)
-** [Redis缓存失效](高并发架构/redis缓存击穿、雪崩、穿透.md)
-** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
-** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
-** [一条url从浏览器输入后都发生来什么](高并发架构/一条url从浏览器输入后都发生来什么.md)
-* Kubernetes
-** [学习笔记-容器](Kubernetea/学习笔记-容器.md)
+** [数组和链表排序](leetcode/数组排序.md)
+** [回溯算法](leetcode/回溯.md)
+** [贪心算法](leetcode)
+** [动态规划与背包问题](leetcode)
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
 ** [PHP内存管理](PHP/PHP内存管理.md)
@@ -36,6 +28,7 @@
 ** [慢sql分析](Mysql/分析为什么一条sql执行很慢.md)
 ** [MVCC实现原理](Mysql/MVCC实现原理.md)
 ** [索引下推](Mysql/索引下推.md)
+** [mysql日志redo undo binlog](Mysql)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
 ** [底层数据结构](Redis/redis-底层数据结构.md)
@@ -50,3 +43,22 @@
 ** [Epoll反应堆](Linux网络编程/linux网络编程-6-epoll反应堆.md)
 ** [线程池](Linux网络编程/linux网络编程-7-线程池.md)
 ** [linux系统学习笔记](Linux网络编程/linux系统.md)
+* 消息队列
+** [Kafka学习笔记](消息队列)
+** [RabbitMq学习笔记](消息队列)
+** [消息队列](消息队列/消息队列.md)
+* Kubernetes
+** [学习笔记-容器](Kubernetea/学习笔记-容器.md)
+* ElasticSearch
+** [ElasticSearch](高并发架构/搜索引擎-ES.md)
+* Git
+** [rebase && merge](Git)
+* 高并发架构
+** [分布式事务](高并发架构/分布式事务.md)
+** [分布式锁](高并发架构/分布式锁.md)
+** [Redis缓存失效](高并发架构/redis缓存击穿、雪崩、穿透.md)
+** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
+** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
+** [一条url从浏览器输入后都发生来什么](高并发架构/一条url从浏览器输入后都发生来什么.md)
+** [设计一个秒杀系统](高并发架构)
+** [限流、降级、熔断](高并发架构)
