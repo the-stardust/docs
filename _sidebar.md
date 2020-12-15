@@ -2,8 +2,8 @@
 ** [二叉树的迭代与递归遍历](leetcode/二叉树的遍历.md)
 ** [数组和链表排序](leetcode/数组排序.md)
 ** [回溯算法](leetcode/回溯.md)
-** [贪心算法](leetcode)
-** [动态规划与背包问题](leetcode)
+** 贪心算法
+** 动态规划与背包问题
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
 ** [PHP内存管理](PHP/PHP内存管理.md)
@@ -36,6 +36,7 @@
 ** [持久化](Redis/redis-持久化.md)
 ** [集群与分布式](Redis/redis集群与分布式.md)
 ** [延迟队列](Redis/手写redis延时队列.md)
+** [Redis缓存失效](Redis/redis缓存击穿、雪崩、穿透.md)
 * Linux网络编程
 ** [Tcp](Linux网络编程/linux网络编程-1-tcp.md)
 ** [Socket](Linux网络编程/linux网络编程-2-socket.md)
@@ -44,21 +45,20 @@
 ** [线程池](Linux网络编程/linux网络编程-7-线程池.md)
 ** [linux系统学习笔记](Linux网络编程/linux系统.md)
 * 消息队列
-** [Kafka学习笔记](消息队列)
-** [RabbitMq学习笔记](消息队列)
+** Kafka学习笔记
+** RabbitMq学习笔记
 ** [消息队列](消息队列/消息队列.md)
 * Kubernetes
 ** [学习笔记-容器](Kubernetea/学习笔记-容器.md)
 * ElasticSearch
 ** [ElasticSearch](高并发架构/搜索引擎-ES.md)
 * Git
-** [rebase && merge](Git)
+** [rebase && merge](Git/rebasemerge.md)
 * 高并发架构
 ** [分布式事务](高并发架构/分布式事务.md)
 ** [分布式锁](高并发架构/分布式锁.md)
-** [Redis缓存失效](高并发架构/redis缓存击穿、雪崩、穿透.md)
 ** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
 ** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
 ** [一条url从浏览器输入后都发生来什么](高并发架构/一条url从浏览器输入后都发生来什么.md)
-** [设计一个秒杀系统](高并发架构)
-** [限流、降级、熔断](高并发架构)
+** 设计一个秒杀系统
+** 限流、降级、熔断
