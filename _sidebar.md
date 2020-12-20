@@ -29,8 +29,8 @@
 ** [慢sql分析](Mysql/分析为什么一条sql执行很慢.md)
 ** [MVCC实现原理](Mysql/MVCC实现原理.md)
 ** [索引下推](Mysql/索引下推.md)
-** mysql日志redo undo binlog(未完成)
-** 索引的行存储与行列混存(未完成)
+** [mysql日志redo undo binlog](Mysql/mysql-日志.md)
+** [索引的行存储与行列混存](Mysql/行列混存.md)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
 ** [底层数据结构](Redis/redis-底层数据结构.md)
@@ -49,6 +49,7 @@
 ** [Epoll反应堆](Linux网络编程/linux网络编程-6-epoll反应堆.md)
 ** [线程池](Linux网络编程/linux网络编程-7-线程池.md)
 ** [linux系统学习笔记](Linux网络编程/linux系统.md)
+** [linux系统命令](Linux网络编程/linux命令.md)
 * 消息队列
 ** Kafka学习笔记(未完成)
 ** RabbitMq学习笔记(未完成)
