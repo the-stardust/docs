@@ -10,7 +10,7 @@ mysql 的日志分为错误日志、查询日志、慢查询日志、事务日�
 当我们想要更新一条数据的时候
 
 1. 执行器去调数据引擎检查这条数据所在的**数据页**是否在**内存中**
-2. 不在内存中，非唯一索引将这个更新的数据对应的数据页操作记录在**ChangeBuffer**中(唯一索引会读去数据磁盘将数据页读入内存)
+2. 不在内存中，非唯一索引将这个更新的数据对应的数据页操作记录在**ChangeBuffer**中(唯一索引会读去数据磁盘将数据页读入内存，因为唯一索引要判断是否冲突)
 3. **Undo Log Buffer** 记录这个更新的相反操作(sql 记录)，属于逻辑日志
 4. **Redo Log Buffer** 记录Changebuffer的改变，属于物理日志，此时设置二阶段提交的第一阶段prepare，**引擎层**记录
 5. **Binlog Buffer** 记录更新逻辑操作，**Server**层记录
@@ -264,3 +264,19 @@ MySQL是通过参数innodb_flush_log_at_trx_commit来控制刷盘时机
 ![](../images/20201011170659996.png)
 
 !> 引用 https://blog.csdn.net/qq_41055045/article/details/108681970
+
+## 思考
+### 为什么binlog没有crash-safe能力，而是需要redo log + binlog
+
+1. redo log 是存储引擎层次innodb独有的，binlog是server层的，也就是说binlog一定有而redolog不一定有
+2. binlog 是在事务commit之后写的，当事务执行一半的时候，数据库宕机，事务就丢失了，所以需要修改binlog写入时机
+3. 历史原因，如果重新设计mysql，binlog如果要做crash-safe的话，也是可以的，只不过要加入checkpoint，数据库重启之后，
+checkpoint之后的sql重放一遍，但是这样做让binlog耦合太严重了
+
+### redo log为什么用两阶段提交
+redo log 独自就保证了crash-safe
+1. redo log和binlog 是两个文件，是两种状态，都代表了数据库的状态，两阶段提交就是为了让这两个状态一致，
+如果不使用两阶段提交，那么使用其中一个日志去恢复数据，数据库的状态就有可能和用它的日志恢复出来的库的状态不一致。
+2. 本质上是因为 redo log 负责事务； binlog负责归档恢复； 各司其职，相互配合，才提供(保证)了现有功能的完整性； 
+现在破坏其中一个log，还想保证上述的功能，除非你从根本上 改写binlog，合并redo log 和 binlog 的 职责 和 功能！！
+3. 库表恢复以及数据库扩容用的都是以“全量备份+应用binlog”的方式实现的
