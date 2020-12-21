@@ -29,7 +29,7 @@
 ** [慢sql分析](Mysql/分析为什么一条sql执行很慢.md)
 ** [MVCC实现原理](Mysql/MVCC实现原理.md)
 ** [索引下推](Mysql/索引下推.md)
-** [mysql日志redo undo binlog](Mysql/mysql-日志.md)
+** [mysql日志架构解析](Mysql/mysql-日志.md)
 ** [索引的行存储与行列混存](Mysql/行列混存.md)
 * Redis
 ** [常用配置](Redis/redis常用配置.md)
