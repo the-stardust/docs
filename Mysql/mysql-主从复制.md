@@ -61,9 +61,20 @@
 
 ### 解决方案
 
+#### 架构优化
 1. 架构上的优化，不要产生大型sql，salve的sql线程是单线程，会卡住
 2. 主库会有写操作，需要较高的安全性，比如 sync_binlog = 1，innodb_flush_log_at_trx_commit = 1等设置都会拖慢机器
 而slave的安全性就没必要这么高，甚至可以关闭binlog，innodb_flushlog也可以关闭来提高sql执行效率
 3. 使用硬件提示slave
+
+#### 实现优化
+1. 强制走主库方案
+2. sleep方案
+3. 判断主备无延迟方案
+4. 配合semi-sync方案
+5. 等主库位点方案
+6. 等GTID方案
+
+[极客时间-Mysql实战45讲-林晓斌](https://time.geekbang.org/column/article/77636)
 
 !> mysql-5.6.3已经支持了多线程的主从复制,但是TPS太高也会拖慢速度
