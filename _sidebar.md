@@ -2,7 +2,6 @@
 ** [二叉树的迭代与递归遍历](leetcode/二叉树的遍历.md)
 ** [数组和链表排序](leetcode/数组排序.md)
 ** [回溯算法](leetcode/回溯.md)
-** 贪心算法(未完成)
 ** [动态规划与背包问题](leetcode/动态规划.md)
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
