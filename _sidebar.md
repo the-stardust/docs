@@ -10,8 +10,7 @@
 ** [PHP内核之HashTable](PHP/PHP数组底层实现.md)
 ** [PHP内核之Zval](PHP/Zval.md)
 * 框架
-** [Laravel中间件原理](框架/Laravel中间件原理.md)
-** Laravel生命周期(未完成)
+** [Laravel](框架/Laravel.md)
 * Go
 ** [Channel](Go/深入理解Go-channel.md)
 ** [Map](Go/深入理解Go-Map.md)
@@ -40,7 +39,7 @@
 ** [详解redis跳跃表](Redis/redis-跳跃表.md)
 ** [持久化](Redis/redis-持久化.md)
 ** [集群与分布式](Redis/redis集群与分布式.md)
-** Redis的事件模型(未完成)
+** [Redis的事件模型](Redis/事件模型.md)
 ** [延迟队列](Redis/手写redis延时队列.md)
 ** [Redis缓存失效](Redis/redis缓存击穿、雪崩、穿透.md)
 * Linux网络编程
@@ -70,6 +69,6 @@
 ** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
 ** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
 ** [url输入浏览器后的流程](高并发架构/url从浏览器输入后的流程.md)
-** 限流、降级、熔断(未完成)
-** 数据库分布式全局唯一id算法(未完成)
-** 负载均衡方案(未完成)
+** [限流、降级、熔断](高并发架构/限流.md)
+** [分布式唯一id算法](高并发架构/分布式唯一id.md)
+** [web应用架构设计](高并发架构/架构设计.md)
