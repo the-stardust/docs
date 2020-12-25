@@ -5,6 +5,7 @@
 ** [动态规划与背包问题](leetcode/动态规划.md)
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
+** [PHP垃圾回收](PHP/PHP的GC.md)
 ** [PHP内存管理](PHP/PHP内存管理.md)
 ** [PHP内核之HashTable](PHP/PHP数组底层实现.md)
 ** [PHP内核之Zval](PHP/Zval.md)
@@ -16,9 +17,10 @@
 ** [Mutex](Go/深入理解Go-mutex.md)
 ** [Slice](Go/深入理解Go-slice.md)
 ** [Defer](Go/深入理解Go语言-Defer.md)
-** [内存分配](Go/深入理解Go语言-内存分配.md)
 ** [GMP](Go/深入理解Go语言-协程调度原理.md)
-** [GC](Go/深入理解Go语言-垃圾回收原理-GC.md)
+** [内存分配](Go/深入理解Go语言-内存分配.md)
+** [垃圾回收GC](Go/深入理解Go语言-垃圾回收原理-GC.md)
+** [逃逸分析](Go/逃逸分析.md)
 ** [迷宫](Go/Go-迷宫-广度优先算法.md)
 * Mysql
 ** [配置文件](Mysql/mysql-配置文件解析.md)

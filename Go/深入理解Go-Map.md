@@ -83,7 +83,7 @@ bucket的数据结构指向下一个bucket的指针成为overflow bucket，意�
 
 为了保证访问效率，当前新的元素添加到map的时候，都会检查是否需要扩容，扩容就是以空间换时间的手段，触发扩容有两个条件
 - 负载因子大于6.5的时候
-- overflow与 2^15的时候，即overflow超过32768的时候
+- overflow大于2^15的时候，即overflow超过32768的时候
 
 ### 增量扩容
 
@@ -108,7 +108,7 @@ hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请�
 
 ![upload successful](../images/pasted-77.png)
 
-数据搬迁过程中，原来的key-value会存储在新的bucket前面，新插入的key-value会村雨新的bucket的后面，实际搬迁过程非常复杂
+数据搬迁过程中，原来的key-value会存储在新的bucket前面，新插入的key-value会存在新的bucket的后面，实际搬迁过程非常复杂
 
 ### 等量扩容
 
@@ -126,7 +126,7 @@ hmap中的oldbuckets成员指身原来的bucket，而buckets指向了新申请�
 1. 根据key值计算出哈希值
 2. 取哈希值的低位，与hmap.B取模确定bucket的位置
 3. 取哈希值的高位在tophash中查找
-4. 如果tophash[i]中存储的值也哈希值相等，则去找改bucket中与key值比较，
+4. 如果tophash[i]中存储的值和哈希值相等，则去找该bucket中与key值比较，
 5. 当前bucket中没找到，就去下个overflow的bucket中查找
 6. 如果此时map处在搬迁的过程中，则优先从oldbuckets中查找
 

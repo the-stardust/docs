@@ -27,7 +27,7 @@ Goroutine是一个很复杂的调度机制，下面尝试使用通俗一点的�
 
 Goroutine主要概念如下：
 - G（Goroutine）：即Go协程，每个go关键字就会开启一个协程
-- M（Machine）：工作线程，在Go里面成为Machine
+- M（Machine）：工作线程，在Go里面称为Machine
 - P（Processor）：处理器（Go里面的概念，不是指CPU），包含运行Go代码所需要的必要资源，也有调度goroutine的能力
 
 M必须拥有一个P才能执行G里面的代码，而G只由P来管理（还有全局队列），P会维护一个G的队列，P可以调度G交给M执行G的代码，其关系如图所示：

@@ -1,5 +1,5 @@
 
-### 前言
+## 前言
 
 >本文图片全部来自于 [Go专家编程](https://rainbowmango.gitbook.io/) 一书，非常幸运能发现这本书
 
@@ -9,7 +9,7 @@ Golang中也实现了内存分配器，原理与tcmalloc类似，简单的说就
 
 >另外，内存分配与GC（垃圾回收）关系密切，所以了解GC前有必要了解内存分配的原理。
 
-### 基础概念
+## 基础概念
 
 为了方便自主管理内存，做法便是先向系统申请一块内存，然后将内存切割成小块，通过一定的内存分配算法管理内存，以64位系统为例，Golang程序启动的时候向系统申请的内存如下图所示：
 
@@ -19,17 +19,17 @@ Golang中也实现了内存分配器，原理与tcmalloc类似，简单的说就
 
 arena的大小为512G，为了方便管理把arena分为一个个的page，每个page位8kb，一共有512G/8Kb个页
 
-spans去也存放span指针，每个指针对应一个page，所以spans区域的大小为（512G/8KB）* 指针大小8byte = 512M
+spans区存放span指针，每个指针对应一个page，所以spans区域的大小为（512G/8KB）* 指针大小8byte = 512M
 
 bitmap区域大小也是通过arena计算出来的，主要用于GC
 
-### span
+## span
 
 span是为了管理arena页存在的，每个span中包含一个或者多个连续页，为了满足小对象分配，span中的一页会划分更小的粒度，而对于大对象来说比如超过页大小，就通过多个页实现
 
-#### class
+### class
 
-根据对象的大小，分为来一系列的class，每个class代表一个固定大小的对象，以及每个span的大小，如下表：
+根据对象的大小，分为了一系列的class，每个class代表一个固定大小的对象，以及每个span的大小，如下表：
 
 	// class  bytes/obj  bytes/span  objects  waste bytes
     //     1          8        8192     1024            0
@@ -108,7 +108,7 @@ span是为了管理arena页存在的，每个span中包含一个或者多个连�
 
 上表可见最大的对象是32k大小左右，超过32k小大的的由特殊的class表示，该class id为0，每个class只包含一个对象
 
-#### span的数据结构
+### span的数据结构
 
 span是管理内存的基本单位，每个span用于管理特定的class对象，根据对象大小，span将一个或多个页拆分为多个块进行管理
 
@@ -130,13 +130,14 @@ span是管理内存的基本单位，每个span用于管理特定的class对象�
 
 ![upload successful](../images/pasted-99.png)
 
-spanclass为10，参照class表可得出npages=1，nelem=56，elemsize=144，其中startAddr是在span初始化时就指定了某个页的地址，allocBits指向一个位图，每位代表一个块是否被分配，本例中有两个被分配，其中allocCount=2
+span的class为10，参照class表可得出npages=1，nelem=56，elemsize=144，其中startAddr是在span初始化时就指定了某个页的地址，allocBits指向一个位图，每位代表一个块是否被分配，本例中有两个被分配，其中allocCount=2
 
 next和prev用于将多个span链接起来，这有利于管理多个span，接下来会进行说明
 
-#### cache
+### cache
 
-有了管理内存的基本单位，还要有个数据结构来管理span，这个数据结构叫做mcentral，各线程需要内存时，从mcentral管理的span中申请内存，为了避免多线程申请内存时不断加锁，Golang为每个线程分配来span缓存，这个缓存即是cache
+有了管理内存的基本单位，还要有个数据结构来管理span，这个数据结构叫做mcentral，各线程需要内存时，从mcentral管理
+的span中申请内存，为了避免多线程申请内存时不断加锁，Golang为每个线程分配了span缓存，这个缓存即是cache
 
 `src/runtime/mcache.go:mcache`定义了cache的数据结构：
 
@@ -154,7 +155,7 @@ mcache和span的对于关系如下图所示：
 
 mchache在初始化时是没有任何span的，在使用过程中会动态的从central中获取并缓存下来，跟据使用情况，每种class的span个数也不相同。上图所示，class 0的span数比class1的要多，说明本线程中分配的大对象要多一些。
 
-#### central
+### central
 
 cache作为线程的私有资源为单个线程服务，而central则是全局资源，为多个线程服务，当某个线程内存不足的时候会向central申请，当某个线程释放内存的时候，就又会回收进central
 
@@ -193,7 +194,7 @@ cache作为线程的私有资源为单个线程服务，而central则是全局�
 
 上说线程从central中获取和归还span只是简单流程，为了简单起见，并未对具体细节展开
 
-#### heap
+### heap
 
 从mcentral数据结构可见，每个mcentral对象只管理特定的calss规格的span，事实上每种class都会对应一个mcentral，这个mcentral的集合存放于mheap数据结构中
 
@@ -221,9 +222,21 @@ cache作为线程的私有资源为单个线程服务，而central则是全局�
 
 mheap内存管理如图所示：
 
-![upload successful](http://blogs.xinghe.host/images/pasted-101.png)
+![upload successful](../images/m_28744576778def4f0cefa8734bc82f59_r.png)
 
 系统预分配的内存为spans、bitmap、arena三个区域，通过mheap管理起来，接下来看内存分配的过程
+
+
+## 总结
+
+Golang内存分配是个相当复杂的过程，其中还掺杂来GC的处理，这里仅仅对其关键数据结构进行来说明，了解其原理而又不至于深陷实现细节
+
+1. Golang程序启动时申请一大块内存，并划分成spans、bitmap、arena区域
+2. arena区域按8kb一页划分成一个个小块
+3. span管理一个或多个页
+4. mcentral管理多个span供线程申请使用，span按对象大小分为67个class，放到mheap.central中的mcentral保存，
+mheap.central是一个67*2的数组，因为每个大小的span都分为notempty、和empty两个mcentral
+5. mcache作为线程私有资源，资源来源于mcentral
 
 ### 内存分配过程
 
@@ -241,17 +254,6 @@ tiny分配和大对象分配都属于内存管理优化范畴，这里暂时仅�
 2. 根据size计算出适合的calss ID
 3. mcache的alloc[class ID]链表中查询可用的span
 4. 如果mcache中没有可用的span则从mcentral申请一个新的span加入缓存，
-5. 如果mcentral也没有可用的span则从mheap中申请一个新的span加入mcentral
+5. 如果mcentral也没有可用的span则从mheap.arena中申请一个新的span加入mcentral
 6. 从该span中获取空闲对象地址并返回
-
-### 总结
-
-Golang内存分配是个相当复杂的过程，其中还掺杂来GC的处理，这里仅仅对其关键数据结构进行来说明，了解其原理而又不至于深陷实现细节
-
-1. Golang程序启动时申请一大块内存，并划分成spans、bitmap、arena区域
-2. arena区域按页划分成一个个小块
-3. span管理一个或多个页
-4. mcentral管理多个soan供线程申请使用
-5. mcache作为线程私有资源，资源来源于mcentral
-
 
