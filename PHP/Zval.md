@@ -23,6 +23,7 @@ struct _zval_struct {
 2. 整数和浮点数不需要进行gc，导致内存浪费
 3. 开启zend内存池的情况下，额外为zval_gc_info申请一个16字节的zend_mm_block结构体(存放内存信息，文末有讲),最后一个zval分配了48个字节
 4. php5的所有变量在堆中申请，PHP7的临时变量在栈中申请
+
 ## php7的zval
 ```
 struct _zval_struct {

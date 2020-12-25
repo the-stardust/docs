@@ -33,7 +33,7 @@ $kernel->terminate($request, $response);
     - 将中间件组注册到路由器
     - 创建请求实例
     - 处理请求 handel
-        - 首先将$request注册打破APP容器
+        - 首先将$request注册到APP容器
         - 清除之前$request实例缓存
         - 启动引导程序(环境检测、配置加载、异常处理、Facades 注册、服务提供者注册、启动服务)
         - 发送请求至路由，通过管道技术将$request进行中间件过滤(array_reduce)

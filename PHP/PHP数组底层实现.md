@@ -235,11 +235,11 @@ ht->nNumUsed - ht->nNumOfElements > (ht->nNumOfElements >> 5)
 rehash会执行以下操作
 
 1. 清空hash区
-2. 取两个指针，一个指向当前扫描位置p，一个指向迁移后的位置q，遍历知道p到底nNumUsed
+2. 取两个指针，一个指向当前扫描位置p，一个指向迁移后的位置q，遍历直到p=nNumUsed
 	- 当p到达undefined的bucket，跳过
     - 当p到达有效bucket的时候，把这个bucket复制到当前q指向的bucket，然后p和q都向前一步(典型的双指针操作)
 3. 重新创建冲突链
-4. 更新内部指针，室其指向更新位置后的bucket
+4. 更新内部指针，使其指向更新位置后的bucket
 5. 更新nNumUsed，使其等于nNumOfElements
 
 **PHP是一次性hash，还有渐进式hash(redis、Golang)**
