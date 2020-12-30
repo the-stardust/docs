@@ -108,6 +108,44 @@ producer保持一致，如果两个配置不一致，那么就会导致，生产
 
 Kafka 会将启用了哪种压缩算法封装进消息集合中，当消息到达 Consumer 端后，由 Consumer 自行解压缩还原成之前的消息。
 
+## 消息丢失
+
+- kafka是能保证消息不丢失的，只要是已提交的消息，什么是已提交呢，就是**若干个**broker接收到消息并写入到日志中，这
+个**若干个**是需要配置，可能是一个broker，也可能是所有broker
+
+### 生产者丢失消息
+
+- 不要使用producer.send(msg),要是有producer.send(msg,callback)，使用回调函数来确认消息是否真正的被接收并写入日志
+- 根据配置可以是有一个broker写入日志成功就认为消息保存成功，也可以是所有broker写入日志才认为保存成功
+
+### 消费者丢失消息
+
+- 保持先消费消息，再提交offset，
+- 避免消息不丢失简单，但是就造成了极有可能消息重复消费，所以消费者端需要再业务上保证幂等性
+
+## 参数设置
+- acks = all :所以broker都保存了消息，才认为消息被接收了
+- retries = MAX; MAX为一个很大的值，表示当消息发送失败或者写入失败，就重试MAX次，直到写入成功
+- unclean.leader.election.enable = false；如果一个broker落后leader很多，就不允许它进行leader的竞争
+- replication.factor >= 3；保证消息有多个副本，即使其中有机器宕机，也有副本顶上去
+- min.insync.replicas > 1；控制消息至少被写入到多少个副本才算成功提交，大于1可以提高消息的持久性和安全性
+- replication.factor > min.insync.replicas；如果两者相等，只要有一个机器挂了，那整个分区就不能工作了，
+推荐设置成 replication.factor = min.insync.replicas + 1
+- enable.auto.commit = false；消费者端的一个参数，把消息自动提交关闭了，让程序进行消息消费后手动提交，
+保证消息不丢失，但是会造成重复消费
+
+## 消息过滤(拦截器)
+
+kafka提供消息过滤机制，类似laravel中间件，在消息发送之前和消息发送成功之后
+- 生产者端可以实现在消息发送前对消息进行过滤+"美容"，
+    - onSend:方法在消息发送之前调用
+    - onAcknowledgement:这个会在消息提交成功或者发送失败后调用，前面提到的发送消息的callback，onAcknowledgement
+    要早于callback调用，但是onAcknowledgement和onSend不在一个线程中调用
+- 消费者端可以实现ConsumerInterceptor接口
+    - onConsume：改方法在消息返回给consumer程序之前调用，也就是正式处理消息之前
+    - onCommit：消费者端提交offset后调用，可以做一些日志以及统计的操作
+        
+!> Kafka 拦截器可以应用于包括客户端监控、端到端系统性能检测、消息审计等多种功能在内的场景
 
 
 

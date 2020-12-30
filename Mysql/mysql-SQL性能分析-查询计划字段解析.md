@@ -6,13 +6,9 @@ MySQL Optimizer是一个专门负责优化SELECT 语句的优化器模块，它�
 ## MySQL的常见瓶颈
 - CPU:SQL中对大量数据进行比较、关联、排序、分组
 
-- IO：
-	- 实例内存满足不了缓存数据或排序等需要，导致产生大量 物理 IO。
-    - 查询执行效率低，扫描过多数据行。
-- 锁：
-    - 不适宜的锁的设置，导致线程阻塞，性能下降。
-    - 死锁，线程之间交叉调用资源，导致死锁，程序卡住。
- - 服务器硬件的性能瓶颈：top,free, iostat和vmstat来查看系统的性能状态
+- IO：实例内存满足不了缓存数据或排序等需要，导致产生大量 物理 IO。查询执行效率低，扫描过多数据行。
+- 锁：不适宜的锁的设置，导致线程阻塞，性能下降。死锁，线程之间交叉调用资源，导致死锁，程序卡住。
+- 服务器硬件的性能瓶颈：top,free, iostat和vmstat来查看系统的性能状态
 
 ## 查询计划(explain)
 - 使用EXPLAIN关键字可以模拟优化器执行SQL查询语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是表结构的性能瓶颈
@@ -31,6 +27,7 @@ MySQL Optimizer是一个专门负责优化SELECT 语句的优化器模块，它�
 - id相同，执行顺序由上至下
 - id不同，如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行 
 - id相同不同，同时存在;  id如果相同，可以认为是一组，从上往下顺序执行；在所有组中，id值越大，优先级越高，越先执行 
+
 ### select_type
 
 >查询的类型，主要是用于区别  普通查询、联合查询、子查询等的复杂查询
@@ -42,6 +39,7 @@ MySQL Optimizer是一个专门负责优化SELECT 语句的优化器模块，它�
 - UNCACHEABLE SUBQUREY：无法被缓存的子查询
 - UNION：若第二个SELECT出现在UNION之后，则被标记为UNION；若UNION包含在FROM子句的子查询中,外层SELECT将被标记为：DERIVED
 - UNION RESULT：从UNION表获取结果的SELECT
+
 ### table
 
 >显示这一行的数据是关于哪张表的
@@ -123,6 +121,7 @@ select id , name from t_xxx where age=18;
 
 >where子句的值总是false，不能用来获取任何元组
  - 例如：select * from test where name='haha' and name ='heihei'; where条件不能name等于两个值
+
 ### select tables optimized away
 
 >在没有GROUPBY子句的情况下，基于索引优化MIN/MAX操作或者对于MyISAM存储引擎优化COUNT(*)操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化。
