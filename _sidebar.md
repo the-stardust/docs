@@ -5,6 +5,8 @@
 ** [数组和链表排序](leetcode/数组排序.md)
 ** [回溯算法](leetcode/回溯.md)
 ** [动态规划与背包问题](leetcode/动态规划.md)
+** [LRU](leetcode/lru.md)
+** [链表翻转](leetcode/链表.md)
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
 ** [PHP垃圾回收](PHP/PHP的GC.md)
@@ -74,4 +76,3 @@
 ** [url输入浏览器后的流程](高并发架构/url从浏览器输入后的流程.md)
 ** [限流、降级、熔断](高并发架构/限流.md)
 ** [分布式唯一id算法](高并发架构/分布式唯一id.md)
-** [web应用架构设计](高并发架构/架构设计.md)
