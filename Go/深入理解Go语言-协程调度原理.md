@@ -1,7 +1,6 @@
 
 ## 前言
 
->本文图片全部来自于 [Go专家编程](https://rainbowmango.gitbook.io/) 一书，非常幸运能发现这本书
 
 Goroutine是一个很复杂的调度机制，下面尝试使用通俗一点的语言和代码来说明一下他的机制
 
@@ -77,3 +76,4 @@ M1的来源可能是M的缓存池，也可能是新建的，当G0完成系统调
 ## 参考文章
 
 > 《The Go scheduler》http://morsmachine.dk/go-scheduler
+> [Go专家编程](https://rainbowmango.gitbook.io/) 

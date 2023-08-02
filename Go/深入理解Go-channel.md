@@ -1,7 +1,5 @@
 ## 前言
 
->本文图片全部来自于 [Go专家编程](https://rainbowmango.gitbook.io/) 一书，非常幸运能发现这本书
-
 "不要通过共享内存来通信，而应该通过通信来共享内存"
 
 风靡golang社区的一句话，channel就是在Go语言里面用于goroutine间的通信，这篇文章从源码的角度分析chan

@@ -1,8 +1,6 @@
 
 ## 前言
 
->本文图片全部来自于 [Go专家编程](https://rainbowmango.gitbook.io/) 一书，非常幸运能发现这本书
-
 互斥锁是并发程序中对共享资源进行访问控制对手段，对此Go语言提供了非常简单易用对互斥锁-Mutex
 
 Mutex是一个结构体类型，实现了Lock()和Unlock()两个方法进行加锁和解锁
@@ -16,7 +14,7 @@ Mutrx用起来特别方便，但其中内部实现却非常复杂，包括Mutex�
 源码包src/sync/mutex.gp Mutex定义了互斥锁的数据结构
 
 	type Mutex struct{
-    	state	int31	
+    	state	int32	
         sema	uint32
     }
 

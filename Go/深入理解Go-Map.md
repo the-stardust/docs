@@ -1,5 +1,4 @@
 ## Map的数据结构
->本文图片全部来自于 [Go专家编程](https://rainbowmango.gitbook.io/) 一书，非常幸运能发现这本书
 
 Go语言的map底层是利用哈希表实现的，一个哈希表里面可以有多个节点，也就是bucket，而每个bucket就保存了map里面的一组键值对
 

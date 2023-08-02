@@ -69,6 +69,8 @@ poll函数就是select函数的升级版，并没有解决循环的问题，只�
             0：立即返回，不阻塞进程
             >0：等待指定毫秒数，如当前系统时间精度不够毫秒，向上取值
 
+
+
 如果不再监控某个文件描述符时，可以把pollfd中，fd设置为-1，poll不再监控此pollfd，下次返回时，把revents设置为0。
 
 select()服务端代码实现：
@@ -175,7 +177,9 @@ epoll 流程为：
     有监听fd事件发送--->返回监听满足数组--->判断返回数组元素--->
     lfd满足accept--->返回cfd---->read()读数据--->write()给客户端回应。
 
+
 epoll除了提供select/poll那种IO事件的**水平触发（Level Triggered）**外，还提供了**边沿触发（Edge Triggered）**，这就使得用户空间程序有可能缓存IO状态，减少epoll_wait/epoll_pwait的调用，提高应用程序效率
+
 
 ### 基础 API
 
@@ -217,8 +221,11 @@ epoll除了提供select/poll那种IO事件的**水平触发（Level Triggered）
 			0：	立即返回，非阻塞
 			>0：	指定毫秒
 		返回值：	成功返回有多少文件描述符就绪，时间到时返回0，出错返回-
-        
-### epoll进阶
+ 
+
+
+
+## epoll进阶
 
 - epoll_create函数创建的其实是一个红黑树，返回的句柄是socket文件描述符，在socket文件描述符表中，取出来是一个指针，指针指向一个红黑树的树根，
 - 使用epoll_ctl就是往红黑树上添加节点，监听socket句柄，或者删除节点，
@@ -239,7 +246,7 @@ epoll除了提供select/poll那种IO事件的**水平触发（Level Triggered）
 所以epoll工作在ET模式的时候，必须使用**非阻塞套接口**，以避免由于一个文件句柄的阻塞读/阻塞写操作把处理多个文件描述符的任务饿死。最好以下面的方式调用ET模式的epoll接口，在后面会介绍避免可能的缺陷。
 
 - 基于非阻塞文件句柄， fcntl 函数可以将一个socket 句柄设置成非阻塞模式: 
-	-  flags = fcntl(sockfd, F_GETFL, 0);  //获取文件的flags值。
+	flags = fcntl(sockfd, F_GETFL, 0);  //获取文件的flags值。
     - fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);   //设置成非阻塞模式；
     - flags  = fcntl(sockfd,F_GETFL,0);
     - fcntl(sockfd,F_SETFL,flags&~O_NONBLOCK);    //设置成阻塞模式；
@@ -249,6 +256,9 @@ epoll除了提供select/poll那种IO事件的**水平触发（Level Triggered）
 - 只有当read或者write返回EAGAIN(非阻塞读，暂时无数据)时才需要挂起、等待。
 	- 这并不是说每次read时都需要循环读，直到读到产生一个EAGAIN才认为此次事件处理完成，当read返回的读到的数据长度小于请求的数据长度时，就可以确定此时缓冲中已没有数据了，也就可以认为此事读事件已处理完成
     
+
+
+
 ### LT模式即Level Triggered工作模式。
 
 与ET模式不同的是，以LT方式调用epoll接口的时候，它就相当于一个速度比较快的poll，无论后面的数据是否被使用。
@@ -256,6 +266,7 @@ epoll除了提供select/poll那种IO事件的**水平触发（Level Triggered）
 LT(level triggered)：LT是缺省的工作方式，并且同时支持block和no-block socket。
 - 在这种做法中，内核告诉你一个文件描述符是否就绪了，然后你可以对这个就绪的fd进行IO操作。
 - 如果你不作任何操作，内核还是会继续通知你的，所以，这种模式编程出错误可能性要小一点。传统的select/poll都是这种模型的代表。
+
 
 ### ET(edge-triggered)：ET是高速工作方式
 
