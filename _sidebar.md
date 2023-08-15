@@ -1,4 +1,3 @@
-* 算法
 * PHP
 ** [PHP生命周期](PHP/PHP生命周期.md)
 ** [PHP垃圾回收](PHP/PHP的GC.md)
