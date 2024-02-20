@@ -55,6 +55,7 @@ Kubernetes是一个开源的容器编排和管理平台，用于自动化部署�
 - Kubernetes会自动逐步替换旧版本的Pod，将其替换为新版本。新的Pod会逐渐启动并接管流量，同时旧版本的Pod逐渐停止接收流量。
 
 - 监视滚动升级过程：可以使用以下命令查看滚动升级的状态： kubectl rollout status deployment <deployment-name>  该命令将显示正在进行滚动升级的Deployment的状态，包括当前的副本集数量和可用性。
+
 #### 回滚
 
 - 查看回滚历史：使用以下命令查看Deployment的回滚历史记录： kubectl rollout history deployment <deployment-name>此命令将显示Deployment的历史版本和相关信息。
@@ -85,6 +86,7 @@ Master节点是Kubernetes集群的控制平面，负责管理和监控整个集�
 - kube-apiserver：提供了Kubernetes API的接口，用于与集群进行交互和管理。
 - kube-controller-manager：运行多个控制器，用于处理集群级别的操作，例如副本管理、节点管理和服务发现等。
 - kube-scheduler：负责根据资源需求和策略将Pod调度到适合的节点上运行。
+
 ### Node节点：Node节点是工作节点，用于运行容器化应用程序。每个Node节点上都会运行以下组件：
 
 - kubelet：作为Node节点上的代理服务，负责与Master节点通信，并管理容器的生命周期。
@@ -122,6 +124,7 @@ Deployment和StatefulSet是Kubernetes中用于管理Pod的两种资源对象，�
 - Deployment适用于无状态应用程序，即应用程序不需要维持任何持久的状态或标识。每个Pod的名称会随着时间推移而变化，以支持水平扩展和滚动升级等操作。
 
 - Deployment提供了滚动更新、回滚、扩缩容等功能，使得应用程序能够在运行过程中持续更新和演进。
+
 ### StatefulSet：
 
 - StatefulSet是一种用于管理有状态应用程序的资源对象，它为每个Pod分配一个唯一的稳定标识符，并按照一定的顺序进行创建和更新。

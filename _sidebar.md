@@ -4,8 +4,6 @@
 ** [PHP内存管理](PHP/PHP内存管理.md)
 ** [PHP内核之HashTable](PHP/PHP数组底层实现.md)
 ** [PHP内核之Zval](PHP/Zval.md)
-* 框架
-** [Laravel](框架/Laravel.md)
 * Go
 ** [Channel](Go/深入理解Go-channel.md)
 ** [Map](Go/深入理解Go-Map.md)
