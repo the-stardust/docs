@@ -11,14 +11,15 @@
     - 获取目前内存占用
             memory_get_usage() : 获取PHP脚本所用的内存大小
             memory_get_peak_usage() ：返回当前脚本到目前位置所占用的内存峰值。
+
+
     
 ## PHP的内存管理
 ![pic](../images/263175-116fa0f4acf9111a.png)
 ### 接口层
 是一些宏定义
 
-### 堆层 
-
+### 堆层
 _zend_mm_heap
 
 初始化内存，调用_zend_mm_startup,PHP内存管理维护三个列表
@@ -27,12 +28,10 @@ _zend_mm_heap
 - 剩余内存列表 rest_buckets
 
 ### 存储层
-
 - 内存分配的方式对堆层透明化，实现存储层和堆层的分离
 - 不同的内存分配方案，有对应的处理函数
 
 ### 内存的申请
-
 PHP对于内存的申请，围绕着小块内存列表(free_buckets)、大块内存列表(large_free_buckets)、剩余内存列表(rest_buckets) 三个列表来分层进行的
 
 ZendMM向OS进行内存申请，首先ZendMM的最底层heap层先向OS申请一块大的内存，通过对上述三个列表的填充，建立一个类似内存池的管理机制

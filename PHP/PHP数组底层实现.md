@@ -125,7 +125,7 @@
 **大致流程就是**
 
 1. key先经过time33得到一个整数，然后与hashTable的nTableMask进行**按位或**操作得到一个负整数
-2. 从第一步拿到的负整数，就是arData的hash区的下标，获取到hash去的bucket
+2. 从第一步拿到的负整数，就是arData的hash区的下标，然后可以获取到hash区的bucket
 3. hash区的bucket里面存储了data区的下标，拿到data区的下标，去data区找到存储数据的bucket
 4. 然后比较当前的key，如果不相等，由bucket->zval->next找到冲突链的下个元素比较，一直遍历到结束，找到元素，没有匹配到就是没有该数据
 
@@ -157,9 +157,9 @@
 
 1. 获取arData的data区最后一元素之后的合法位置(因为数组删除是把当前位定义为undefined，并不立马回收)，这里的bucket称为bucketA
 2. 把要添加的元素值放入 BucketA 的 val 。
-3. 把hash后的key经过(h | nTableMask) 位置指向的data下标存储的bucket称为bucketB
-4. 把bucketA的val的next指向bucketB
-5. 更新hash区(h | nTableMask)位置的值为bucketA的下标
+3. 把hash后的key经过(h | nTableMask) 位置指向的data下标存储的bucket称为bucketB，也就是冲突链的第一个元素，这里使用头插法来插入链表的头部
+4. 把bucketA的val的next指向bucketB，这一步就头插法的第二步，也是最后一步
+5. 更新hash区(h | nTableMask)位置的值为bucketA的下标（原本这个位置的下标，是之前冲突链的第一个，现在改成了新插入和的bucket的下标，也就是头插法）
 
 这个插入过程是遇到冲突的插入过程，冲突链表采用头插法插入到链表的第一个元素，更新hash的bucket存储的下标为新的bucket的下标
 

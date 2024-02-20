@@ -36,6 +36,7 @@ slow_query_log 和slow_query_log_file后，然后重启MySQL服务器。也即�
 		long_query_time=3;
 		log_output=FILE
         
+
 ## 日志分析工具mysqldumpslow
 ### mysqldumpslow --help
 
@@ -65,13 +66,13 @@ slow_query_log 和slow_query_log_file后，然后重启MySQL服务器。也即�
 
 		mysqldumpslow -s r -t 10 /var/lib/mysql/atguigu-slow.log | more
         
-## profile
 
+## profile
 ### 简介
 
 - 是mysql提供可以用来分析当前会话中语句执行的资源消耗情况。可以用于SQL的调优的测量
 - 默认情况下，参数处于关闭状态，并保存最近15次的运行结果
-- Show  variables like 'profiling'; 默认是关闭，使用前需要开启
+- Show variables like 'profiling'; 默认是关闭，使用前需要开启
 - set profiling=1; 开启
 - 查看结果，show profiles;
 
@@ -83,15 +84,15 @@ slow_query_log 和slow_query_log_file后，然后重启MySQL服务器。也即�
 
 cpu block io 等参数说明 type: 
 ```
-| ALL                        --显示所有的开销信息  
-| BLOCK IO                --显示块IO相关开销  
-| CONTEXT SWITCHES --上下文切换相关开销  
-| CPU              --显示CPU相关开销信息  
-| IPC              --显示发送和接收相关开销信息  
-| MEMORY           --显示内存相关开销信息  
-| PAGE FAULTS      --显示页面错误相关开销信息  
-| SOURCE           --显示和Source_function，Source_file，Source_line相关的开销信息  
-| SWAPS            --显示交换次数相关开销的信息
+| ALL --显示所有的开销信息
+| BLOCK IO  --显示块IO相关开销
+| CONTEXT SWITCHES --上下文切换相关开销
+| CPU --显示CPU相关开销信息
+| IPC --显示发送和接收相关开销信息
+| MEMORY --显示内存相关开销信息
+| PAGE FAULTS --显示页面错误相关开销信息
+| SOURCE --显示和Source_function，Source_file，Source_line相关的开销信息
+| SWAPS --显示交换次数相关开销的信息
 ```
 - 日常开发需要注意的结论
 
@@ -100,6 +101,7 @@ cpu block io 等参数说明 type:
   3. Copying to tmp table on disk 把内存中临时表复制到磁盘，危险！！！
   4. locked
   
+
 #### 全局查询日志
 
 **永远不要在生产环境下使用**
