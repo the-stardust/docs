@@ -111,7 +111,7 @@ nginx是在此处作为反向代理服务器，转发请求的，此处就不再
 这里简单介绍下他们工作的流程
 
 1. 客户端发起请求，此时请求会到nginx这里
-2. nginx也是master worker模式，master分发请求到worker，worker利用了异步I/O多路复用的epoll实现，
+2. nginx也是master worker模式，worker会accept请求，这里使用了accept_mutex的东西来解决惊群效应，worker利用了异步I/O多路复用的epoll实现，
 3. nginx的worker看请求的是静态文件还是动态内容，可以在nginx配置里面设置转发请求，静态文件就直接返回给客户端了，如果是动态内容，比如index.php，此时，使用socket通信，通过fastcgi协议将请求转发给php-fpm
 4. php-fpm的worker进程accept到了请求,就走下面的流程；如何没有空闲的worker，并且配置的最大值 pm.max_children = 50 ，这里是50个worker，就会阻塞等待其他worker处理完
 5. worker进程把请求交给php解析器，php解析器进行解析，比如从redis、mysql取出数据等，然后返回给worker
