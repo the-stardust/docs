@@ -1,0 +1,24 @@
+FROM golang:1.17 as builder
+WORKDIR /go/src/proj/
+COPY . .
+RUN export GOPROXY=https://goproxy.io,direct && GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -tags=jsoniter -a --ldflags="-s" -o main .
+
+FROM liboffice
+WORKDIR /liboffice
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV TZ=Asia/Shanghai
+COPY LibreOffice_7.4.3_Linux_x86-64_rpm.tar /liboffice
+RUN tar -xzvf LibreOffice_7.1.2_Linux_x86-64_rpm.tar.gz
+RUN rpm -rebuilddb && yum install LibreOffice_7.4.3_Linux_x86-64_rpm.tar/RPMS/*.rpm -y
+RUN rpm -rebuilddb &&  yum install libreoffice-headless -y
+
+
+RUN rm -rf /liboffice/*
+
+FROM registry.cn-zhangjiakou.aliyuncs.com/xintujing/xtj-alpine:0.0.2
+WORKDIR /root/
+COPY --from=builder /go/src/proj/main .
+ENV GO_ENV production
+EXPOSE 8040:8040
+CMD ["./main"]

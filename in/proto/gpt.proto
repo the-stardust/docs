@@ -1,0 +1,22 @@
+syntax="proto3";
+
+option go_package = "./proto";
+
+message GPTRequest {
+  float temperature = 1;
+  float top_p = 2;
+  string system_content = 3;
+  string prompt = 4;
+  int32 retry_times = 5;
+  bool is_use_4 = 6;
+  bool is_front =7;
+}
+
+message GPTResponse {
+  repeated string msg = 1;
+}
+
+service GPT {
+  rpc StreamChat(GPTRequest) returns (stream GPTResponse) {}
+  rpc Chat(GPTRequest) returns (GPTResponse) {}
+}

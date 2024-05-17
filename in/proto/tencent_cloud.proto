@@ -1,0 +1,18 @@
+syntax="proto3";
+
+option go_package = "./proto";
+
+message TencentCloudCreateRecRequest {
+  string audio_url = 1;
+  string callback_url = 2;
+}
+
+message TencentCloudResponse {
+  string msg = 1;
+  int32 code = 2;
+  uint64 data = 3;
+}
+
+service TencentCloud {
+  rpc CreateRecTask(TencentCloudCreateRecRequest) returns (TencentCloudResponse) {}
+}

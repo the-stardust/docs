@@ -1,0 +1,83 @@
+mongodb:
+  username: 'interview'
+  password: interview_pwd_0O
+  path: '192.168.101.12:57017'
+  db-name: 'interview'
+
+bank-mongodb:
+  username: 'question_bank_dev'
+  password: SdHzCxNb666MyHoney
+  path: '192.168.101.12:57017'
+  db-name: 'question_bank_dev'
+
+mysql:
+  path: "39.101.186.110:3306"
+  username: "dev-ydh"
+  password: "cc3113890ecb4433d960c69acfff350!"
+  db-name: "xtj_user_center"
+
+redis:
+  addr: '39.101.186.110:6379'
+  password: 'dev-passwd'
+  db: 8
+  max-idle: 16
+  max-active: 0
+  idle-timeout: 300
+  expire: 108000
+  bank-db: 0
+
+es:
+  elastic_url: "http://192.168.101.1:9200"
+  elastic_name: "elastic"
+  elastic_pwd: "1_have_t0!d_u"
+
+# logger configuration
+log:
+  prefix: 'interview-log'
+  log-type: 'file'
+  file-path: '/tmp/log/'
+  debug: true
+
+service-urls:
+  parse-url: 'http://10.1.0.63:6324'
+  upload-url: 'https://api.xtjstatic.cn/upload'
+  user-info-url: 'http://new-userlogin-http.user-center.svc.cluster.local/new-userinfo/users-info'
+  relevance-course-url: 'http://course-manager-svc.online.svc.cluster.local'
+  mobile-2-user: 'http://safeguard-http-svc.safeguard.svc.cluster.local:8888/SwimRingQueryByMobile'
+  register-user-url: 'http://new-userlogin-http.user-center.svc.cluster.local/inner/member/register'
+  user-login-url: 'http://new-userlogin-http.user-center.svc.cluster.local'
+  user-mobile-url: 'http://safeguard-http-svc.safeguard.svc.cluster.local:8888'
+  grow-url: 'http://grow-svc.grow:80'
+  token-url: 'http://union-gateway-auth-svc.ambassador.svc.cluster.local:3000'
+  question-bank-url : 'http://127.0.0.1:8030'
+
+
+signature-info:
+  sk: "eAq4wCFm1q12qZ3k"
+
+gpt:
+  api-key: "d99700b22acb4b6ea683b7cf4f8c4145"
+  base-url : "https://openai-us-cs-1.openai.azure.com/"
+  engine: "gpt-35-turbo-0301"
+
+gpt4:
+  api-key: "5080bfaba7a34e03972d48fdb181465a"
+  base-url: "https://openai-41-jp-east.openai.azure.com/"
+  engine: "gpt-4"
+
+tts:
+  azure-key: "177925179b924ce5979164c7f7504d2a"
+  azure-region: "eastasia"
+  azure-male-voice-name: "zh-CN-YunxiNeural"
+  azure-female-voice-name: "zh-CN-XiaoxiaoNeural"
+  head-prompt: ""
+  tail-prompt: ""
+  concurrency: 200
+
+kafka:
+  address: 'alikafka-pre-cn-zvp2iq45d00g-1-vpc.alikafka.aliyuncs.com:9092,alikafka-pre-cn-zvp2iq45d00g-2-vpc.alikafka.aliyuncs.com:9092,alikafka-pre-cn-zvp2iq45d00g-3-vpc.alikafka.aliyuncs.com:9092'
+  group-id: ''
+  gpt-service-group-id: 'interview-gpt-common-dev-grp'
+  gpt-question-preview-topic: 'gpt-question-preview-topic'
+  question-gpt-common-topic: 'question-gpt-common'
+
