@@ -32,7 +32,7 @@ class Detect {
     private SL_MIN_HEIGHT = 10
     private SL_MAX_HEIGHT = 40
     public static tempGray = null
-    public static xingce_value = 0.4
+    public static xingce_value = 0.5
 
 
     constructor() {
@@ -238,7 +238,7 @@ class Detect {
     private static getPhoneFromCamara(originImage, adaptiveImage, phoneOption) {
         let phone = ''
         let start = {x: phoneOption.rect.x, y: phoneOption.rect.y}
-        let step = {x: phoneOption.rect.width / 11, y: phoneOption.rect.height / 10}
+        let step = {x: phoneOption.rect.width / 11, y: phoneOption.rect.height / 10.2}
 
         for (let x = 0; x < 11; x++) {
             let score = []
@@ -499,7 +499,7 @@ class Detect {
 
             four = new cv.Mat()
             cv.cvtColor(origin, four, cv.COLOR_RGBA2GRAY, 0)
-            cv.adaptiveThreshold(four, four, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 9, 1)
+            cv.adaptiveThreshold(four, four, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2)
 
             resp.phone = Detect.getPhoneFromCamara(origin, four, {
                 rect: {
@@ -603,8 +603,8 @@ class Detect {
                         const rect = [
                             currentRow[j],
                             currentRow[j + 1],
-                            nextRow[j + 1],
-                            nextRow[j]
+                            nextRow[j],
+                            nextRow[j + 1]
                         ];
 
                         const rectImg = Detect.fourPointsTransform(origin, rect);
@@ -626,15 +626,28 @@ class Detect {
                 resp.answer = []
                 let tmIndex = 0
                 for (let card of cardList) {
+
+                    let defaultStartX = 19 + (ns % 5)
+                    let defaultStartY = 41
+                    if( Math.floor(ns / 5) == 4){
+                        defaultStartY += 4
+                    }
+
                     for (let x = 0; x < 5; x++) {
                         tmIndex += 1
                         let ans = []
                         for (let y = 0; y < 4; y++) {
-                            let startX = 16 + x * 45
-                            let startY = 37 + y * 25
-                            let w = 35
-                            let h = 17
-                            console.log(this.xingce_value, '0000')
+                            let startX = defaultStartX + x * 44
+                            let startY = defaultStartY + y * 24
+                            let w = 30
+                            let h = 15
+
+                            // let sp1 = new cv.Point(startX, startY)
+                            // let sp2 = new cv.Point(startX + w, startY + h)
+                            // cv.rectangle(shows[ns], sp1, sp2, [0, 0, 255, 255], 2)
+
+                            // console.log(this.xingce_value, '0000')
+                            // console.log(Detect.calcRectWeight(card, new cv.Rect(startX, startY, w, h)))
                             if (Detect.calcRectWeight(card, new cv.Rect(startX, startY, w, h)) > this.xingce_value) {
                                 ans.push('abcd'[y])
                             }
