@@ -83,12 +83,12 @@ class Detect {
         const markerCorners = new cv.MatVector();
 
         try {
+            let as = 0
             for (const rect of rects) {
                 const roi = mat.roi(rect);
                 // cv.adaptiveThreshold(roi, roi, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 5, 1)
-
+                cv.GaussianBlur(roi, roi, new cv.Size(11, 11), 0);
                 // let canv = document.createElement('canvas');
-                // cv.imshow(canv, roi)
                 // document.body.appendChild(canv)
                 cv.detectMarkers(roi, this.dictionary, markerCorners, markerIds);
                 roi.delete();
@@ -135,6 +135,7 @@ class Detect {
             let width = img.cols
             let height = img.rows
 
+            // cv.imshow("outCanvas",adaptive)
             let result = this.detectMarkersInRects(gray, [
                 new cv.Rect(width - 130, 530, 130, 130),
                 new cv.Rect(0, height - 660, 130, 130),
@@ -145,7 +146,11 @@ class Detect {
                 new cv.Rect(width - 500 - 200, height - 200, 200, 200),
 
             ])
-            console.log(result)
+            // let sp1 = new cv.Point(result.x, result.y)
+            // let sp2 = new cv.Point(result.x + result.width, result.y + result.height)
+            // cv.rectangle(img, sp1, sp2, [0, 0, 255, 255], 2)
+            // cv.imshow("outCanvas",img)
+            console.log("result",result)
 
             if (result) {
                 this.idsIndex = i
@@ -236,6 +241,12 @@ class Detect {
 
 
     private static getPhoneFromCamara(originImage, adaptiveImage, phoneOption) {
+        // phoneOption: {
+        //     x: 503,
+        //     y: 92,
+        //     width: 485,
+        //     height: 230
+        // }
         let phone = ''
         let start = {x: phoneOption.rect.x, y: phoneOption.rect.y}
         let step = {x: phoneOption.rect.width / 11, y: phoneOption.rect.height / 10.2}
@@ -473,6 +484,10 @@ class Detect {
                     ic++
                 }
                 if (ic == 4) {
+                    let area = cv.contourArea(contours.get(i))
+                    if (area < 1200 || area > 2500){
+                        continue
+                    }
                     cv.drawContours(mat, contours, i, [255, 0, 0, 255], 2)
                     let p = cv.moments(contours.get(i))
                     points.push({
@@ -482,10 +497,11 @@ class Detect {
                 }
             }
 
-            // console.log(points)
-            //
+            // cv.imshow("outCanvas",mat)
+            // console.log("points",points)
 
             if (points.length !== 4) {
+                console.log("points.length !=== 4:",points.length)
                 return resp
             }
 
@@ -501,6 +517,7 @@ class Detect {
             cv.cvtColor(origin, four, cv.COLOR_RGBA2GRAY, 0)
             cv.adaptiveThreshold(four, four, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2)
 
+            // console.log("four",four)
             resp.phone = Detect.getPhoneFromCamara(origin, four, {
                 rect: {
                     x: 503,
@@ -510,16 +527,16 @@ class Detect {
                 }
             })
 
+            console.log("phone",resp.phone)
             let res = new cv.Mat()
             cv.matchTemplate(four, tempGray, res, cv.TM_CCOEFF_NORMED);
-            // cv.imshow('output', four)
             resp.strp = 1.5
 
             const threshold = 0.7;
             const [w, h] = [tempGray.cols, tempGray.rows];
 
             const locationsData = res.data32F;
-            console.log(locationsData)
+            // console.log(locationsData)
             let locations = [];
             for (let i = 0; i < locationsData.length; i++) {
                 if (locationsData[i] >= threshold) {
@@ -532,7 +549,7 @@ class Detect {
                 }
             }
 
-
+            // console.log(locations)
             resp.strp = 2
             locations.sort((a, b) => b.score - a.score);
             // 过滤距离小于 50 的重复点
@@ -546,7 +563,6 @@ class Detect {
                     filteredLocations.push(loc);
                 }
             }
-
             resp.strp = 3
             filteredLocations = filteredLocations.map(obj => obj.point)
             filteredLocations = filteredLocations.filter(obj => obj .x > 100 && obj.x < 900 && obj.y < 1330 && obj.y > 100)
@@ -555,9 +571,6 @@ class Detect {
             for (let i = 0; i < filteredLocations.length; i++) {
                 cv.circle(origin, filteredLocations[i], 5, [0, 255, 0, 255], 5)
             }
-
-            console.log(filteredLocations)
-            // cv.imshow('output', origin)
 
             resp.strp = 4
 
@@ -569,6 +582,7 @@ class Detect {
                 let index = 0
                 rowList[0] = []
                 rowList[0].push(filteredLocations[0])
+                // console.log(filteredLocations[0])
                 filteredLocations[0].index = 0
                 for (let i = 1; i < filteredLocations.length; i++) {
                     filteredLocations[i].index = i;
@@ -595,6 +609,7 @@ class Detect {
                 rowList.push(lastRow);
 
                 let cardList = []
+                // let shows = []
                 for (let i = 0; i < rowList.length - 1; i++) {
                     const currentRow = rowList[i];
                     const nextRow = rowList[i + 1];
@@ -608,12 +623,17 @@ class Detect {
                         ];
 
                         const rectImg = Detect.fourPointsTransform(origin, rect);
+
+
                         let canv = document.createElement('canvas');
                         let cardMat = new cv.Mat()
                         let cardGrayMat = new cv.Mat()
                         cv.cvtColor(rectImg, cardGrayMat, cv.COLOR_RGBA2GRAY, 0)
                         cv.adaptiveThreshold(cardGrayMat, cardMat, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 33, 1)
                         let cardMatResized = Detect.resize(cardMat, 250, 150)
+
+                        // let rr = Detect.resize(rectImg, 250, 150)
+                        // shows.push(rr);
                         cardList.push(cardMatResized)
                         // cv.imshow(canv, cardMatResized)
                         document.body.appendChild(canv)
@@ -622,10 +642,20 @@ class Detect {
                         cardMat.delete()
                     }
                 }
-
+                let ns = 0
                 resp.answer = []
+
                 let tmIndex = 0
                 for (let card of cardList) {
+                    // let last = Math.floor(card.rows / 5);
+                    // 定义感兴趣的区域（ROI）
+                    // let rect = new cv.Rect(0, last, card.cols, card.rows - last);
+                    // let dst = card.roi(rect)
+                    // let showa = shows[ns]
+                    // let showaaa = showa.roi(rect)
+                    // let ans = Detect.dealAnswer(dst,showaaa,ns)
+                    // console.log(ans)
+                    // ns++
 
                     let defaultStartX = 19 + (ns % 5)
                     let defaultStartY = 41
@@ -652,16 +682,23 @@ class Detect {
                                 ans.push('abcd'[y])
                             }
                         }
+                        // console.log("------")
+                        // console.log(ans)
 
                         resp.answer.push({
                             "id": tmIndex,
                             "answer": ans
                         })
                     }
+                    ns++
                 }
 
-
-                console.log(cardList)
+                // for(let i = 0;i <shows.length;i++){
+                //     let nn = "ccccc" + i
+                //     cv.imshow(nn,shows[i])
+                // }
+                // cv.imshow("outCanvas",origin)
+                // console.log(cardList)
 
             } else {
                 resp.status = 'error'
@@ -671,6 +708,7 @@ class Detect {
             origin.delete()
             four.delete()
             res.delete()
+            console.log("respppp",resp)
         } catch (e) {
             console.error(e, e.stack)
             resp.status = 'error'
@@ -684,6 +722,299 @@ class Detect {
         }
 
         return resp
+    }
+    static dealAnswer(dst,showaaa,ns){
+        let contours = new cv.MatVector();
+        let hierarchy = new cv.Mat();
+        // Find contours
+        cv.findContours(dst, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
+        let all_center = []
+        let center2contour = new Map()
+        let allW = 0
+        let allH = 0
+        for (let i = 0; i < contours.size(); i ++) {
+            let contour = contours.get(i)
+
+            let minAreaRect = cv.minAreaRect(contour)
+            // console.log("ddd",minAreaRect.size.width,minAreaRect.size.height)
+            if (minAreaRect.size.width > dst.size().width / 6 || minAreaRect.size.height > dst.size().height / 4.5) {
+                continue
+            }
+
+            if (minAreaRect.size.width < dst.size().width / 8 || minAreaRect.size.height < dst.size().height / 6.6) {
+                continue
+            }
+            allW += minAreaRect.size.width
+            allH += minAreaRect.size.height
+            all_center.push(minAreaRect.center)
+            center2contour.set(minAreaRect.center,contour)
+            cv.drawContours(dst, contours, i, [255, 0, 0,255], 1);
+        }
+        if (all_center.length == 0 ) {
+            return []
+        }
+        // console.log(all_center)
+        // 轮廓去重
+        let uniqueCenters = Detect.removeSimilarCoordinates(all_center, 5)
+        // console.log(uniqueCenters)
+        let completeCenters = Detect.completeAnswer(uniqueCenters,dst.size().width,dst.size().height)
+        // console.log(completeCenters)
+        let defaultWeight = Math.round(allW / center2contour.size * 10) / 10
+        let defaultHeight = Math.round(allH / center2contour.size * 10) / 10
+        // console.log(defaultWeight, defaultHeight)
+        let resAnswer = []
+        // resAnswer.push(ansSelect)
+        for (let groupIndex = 0; groupIndex < completeCenters.length; groupIndex++) {
+            let group = completeCenters[groupIndex]
+            let tmpBack = []
+            let groupAnsList = []
+            for (let j = 0; j < group.length; j++) {
+                let contour = null
+                if (center2contour.has(group[j])){
+                    contour = center2contour.get(group[j])
+                }else{
+                    let topLeft = new cv.Point(group[j].x - defaultWeight / 2, group[j].y - defaultHeight / 2);
+                    let topRight = new cv.Point(group[j].x + defaultWeight / 2, group[j].y - defaultHeight / 2);
+                    let bottomRight = new cv.Point(group[j].x + defaultWeight / 2, group[j].y + defaultHeight / 2);
+                    let bottomLeft = new cv.Point(group[j].x - defaultWeight / 2, group[j].y + defaultHeight / 2);
+                    // 创建一个 cv.Mat 来存储这些顶点
+                    contour = cv.matFromArray(4, 1, cv.CV_32SC2, [
+                        topLeft.x, topLeft.y,
+                        topRight.x, topRight.y,
+                        bottomRight.x, bottomRight.y,
+                        bottomLeft.x, bottomLeft.y
+                    ]);
+                }
+
+                // let l = new cv.Mat()
+                // cv.approxPolyDP(contour,l,0.025 * cv.arcLength(contour, true),true)
+                let rect = cv.boundingRect(contour)
+
+                // let sp1 = new cv.Point(rect.x, rect.y)
+                // let sp2 = new cv.Point(rect.x + rect.width, rect.y + rect.height)
+                // cv.rectangle(showaaa, sp1, sp2, [0, 0, 255, 255], 1)
+
+                // console.log("rect",rect.x,rect.y,rect.width,rect.height)
+                let w = Math.round(rect.width / 8 * 10) / 10;
+                let h = Math.round(rect.height / 7 * 10) / 10;
+                rect.x = rect.x + w
+                rect.y = rect.y + h
+                rect.width = rect.width - w * 1.8
+                rect.height = rect.height - h * 1.8
+                // console.log("after",rect.x, rect.y, rect.width, rect.height)
+                let optionsImage = dst.roi(rect)
+                // cv.rectangle(showaaa, sp1, sp2, [0, 0, 255, 255], 1)
+                let resizeImage = Detect.resize(optionsImage,defaultWeight,defaultHeight)
+                // imageArr.push(resizeImage)
+                let blackPixelCount = Detect.countBlack(resizeImage)
+                // let total = resizeImage.width * resizeImage.height
+                let total = defaultWeight*defaultHeight
+                // console.log('blackPixelCount', Math.round(blackPixelCount/total * 10000) / 10000)
+                if (Math.round(blackPixelCount/total * 10000) / 10000 > 0.4) {
+                    tmpBack.push(Detect.getOptionsAns(j))
+                }
+            }
+            resAnswer.push(tmpBack)
+            // console.log(tmpBack)
+            // console.log("-------")
+        }
+        // return dst
+        // return [resAnswer,imageArr]
+        // let n = "ccccc" + ns
+        // cv.imshow(n,showaaa)
+        return resAnswer
+    }
+    static getOptionsAns(j) {
+        switch (j){
+            case 0:
+                return "a"
+            case 1:
+                return "b"
+            case 2:
+                return "c"
+            case 3:
+                return "d"
+        }
+    }
+    static countBlack(image){
+        let blackPixelCount = 0;
+        for (let row = 0; row < image.rows; row++) {
+            for (let col = 0; col < image.cols; col++) {
+                let pixel = image.ucharAt(row, col); // 获取灰度值
+                if (pixel === 0) { // 黑色像素
+                    blackPixelCount++;
+                }
+            }
+        }
+        return blackPixelCount;
+    }
+    static completeAnswer(uniqueCenters,dstW,dstH){
+        let default_y = dstW * 0.078
+        let default_x = dstH * 0.29
+        uniqueCenters.sort((a, b) => a.y - b.y);
+        if (uniqueCenters[0].y < 45){
+            let group = Detect.findSimilarY(uniqueCenters,uniqueCenters[0].y)
+            let all = 0
+            for (let i = 0; i < group.length; i++) {
+                all += group[i].y
+            }
+            default_y = Math.round(all/group.length * 10)/10
+        }
+        uniqueCenters.sort((a, b) => a.x - b.x);
+        if (uniqueCenters[0].x < 70){
+            let group = Detect.findSimilarX(uniqueCenters,uniqueCenters[0].x)
+            let all = 0
+            for (let i = 0; i < group.length; i++) {
+                all += group[i].x
+            }
+            default_x = Math.round(all/group.length * 10)/10
+        }
+        // console.log(default_x,default_y)
+        // 圆心直接的平均宽度距离
+        let avg_w = Detect.getAvgW(uniqueCenters,dstW/5,10)
+        // 圆心直接的平均高度距离
+        let avg_h = Detect.getAvgH(uniqueCenters,10,dstH/4.5)
+        // console.log("aaaa",default_x,default_y,avg_w,avg_h)
+        uniqueCenters.sort((a, b) => a.y - b.y);
+        let res = []
+
+        for (let i = 0;i < 5;i++){
+            let findX = default_x + avg_w * i
+            let groupX = Detect.findSimilarX(uniqueCenters,findX)
+            if (groupX.length == 0 ){
+                groupX.push({x:findX,y:default_y})
+            }
+            if (groupX.length == 4){
+                res.push(groupX)
+                continue
+            }
+            groupX.sort((a, b) => a.y - b.y)
+            let pre = groupX[0]
+            let step = 0
+
+            if (!(Detect.isSimilar(pre,{x:findX,y:default_y},5))) {
+                // 计算按 y 坐标排序后的第一位,是不是第一个元素,不是的话按 num 补全curr前面的元素
+                step = Math.round(Math.abs(pre.y - default_y) / avg_h)
+                for (let z = 1; z <= step; z++) {
+                    groupX.unshift({x:pre.x,y:pre.y - z * avg_h})
+                }
+            }
+            if (groupX.length == 4){
+                res.push(groupX)
+                continue
+            }
+            let curr = step
+            while (curr < 3){
+                if (curr == groupX.length - 1){
+                    let currItem = groupX[curr]
+                    for (let z = 1; z < 4-curr; z++) {
+                        groupX.push({x:currItem.x,y:currItem.y + z * avg_h})
+                    }
+                    break
+                }else{
+                    let next = curr + 1
+                    let nextItem = groupX[next]
+                    let currItem = groupX[curr]
+
+                    let num = Math.round(Math.abs(nextItem.y - currItem.y) / avg_h)
+                    if (num > 1){
+                        let preGroup = groupX.slice(0,curr+1)
+                        let lastGroup = groupX.slice(next,groupX.length)
+                        let tmpGroup = []
+                        for (let j = 1; j < num; j++){
+                            tmpGroup.push({x:currItem.x,y:currItem.y + j * avg_h})
+                        }
+                        groupX = [...preGroup,...tmpGroup,...lastGroup]
+                    }
+                    curr = curr + num
+                }
+            }
+            res.push(groupX)
+        }
+        return res
+    }
+
+    static isSimilar(coord1, coord2, threshold) {
+        return Math.abs(coord1.x - coord2.x) < threshold && Math.abs(coord1.y - coord2.y) < threshold;
+    }
+    static getAvgW(uniqueCenters,diffX,diffY){
+        uniqueCenters.sort((a, b) => a.y - b.y);
+        let newGroup = []
+        let curr = 0;
+        let i = 1;
+        while (i < uniqueCenters.length) {
+            let tmp = []
+            tmp.push(uniqueCenters[curr]);
+            // while (i < uniqueCenters.length && Math.abs(uniqueCenters[curr].y - uniqueCenters[i].y) < 10){
+            while (i < uniqueCenters.length && Math.abs(uniqueCenters[curr].y - uniqueCenters[i].y) < diffY){
+                tmp.push(uniqueCenters[i]);
+                i++
+            }
+            newGroup.push(tmp);
+            curr = i
+            i++
+        }
+        let allW = 0
+        let wCount = 0
+        for (let i = 0; i < newGroup.length; i++) {
+            let tmpGroup = newGroup[i];
+            tmpGroup.sort((a, b) => a.x - b.x);
+            if (tmpGroup.length < 2 ){
+                continue
+            }
+            let pre = 0
+            let curr = 1
+            while (curr < tmpGroup.length){
+                // if (Math.abs(tmpGroup[pre].x - tmpGroup[curr].x) < 30){
+                if (Math.abs(tmpGroup[pre].x - tmpGroup[curr].x) < diffX){
+                    allW += Math.abs(tmpGroup[pre].x - tmpGroup[curr].x)
+                    wCount++
+                }
+                pre++
+                curr++
+            }
+        }
+        return Math.round(allW/wCount * 10) / 10
+    }
+    static getAvgH(uniqueCenters,diffX,diffY){
+        uniqueCenters.sort((a, b) => a.x - b.x);
+
+        let newGroup = []
+        let curr = 0;
+        let i = 1;
+        while (i < uniqueCenters.length) {
+            let tmp = []
+            tmp.push(uniqueCenters[curr]);
+            // while (i < uniqueCenters.length && Math.abs(uniqueCenters[curr].x - uniqueCenters[i].x) < 5){
+            while (i < uniqueCenters.length && Math.abs(uniqueCenters[curr].x - uniqueCenters[i].x) < diffX){
+                tmp.push(uniqueCenters[i]);
+                i++
+            }
+            newGroup.push(tmp);
+            curr = i
+            i++
+        }
+        let allH = 0
+        let hCount = 0
+        for (let i = 0; i < newGroup.length; i++) {
+            let tmpGroup = newGroup[i];
+            tmpGroup.sort((a, b) => a.y - b.y);
+            if (tmpGroup.length < 2 ){
+                continue
+            }
+            let pre = 0
+            let curr = 1
+            while (curr < tmpGroup.length){
+                // if (Math.abs(tmpGroup[pre].y - tmpGroup[curr].y) < 23){
+                if (Math.abs(tmpGroup[pre].y - tmpGroup[curr].y) < diffY){
+                    allH += Math.abs(tmpGroup[pre].y - tmpGroup[curr].y)
+                    hCount++
+                }
+                pre++
+                curr++
+            }
+        }
+        return  Math.round(allH/hCount * 10) / 10
     }
 
     private detectXcCard() {
@@ -718,7 +1049,6 @@ class Detect {
         this.originList[0] = tmpMat
 
         // console.log(tmpMat)
-        // cv.imshow('output', this.originList[0])
 
         return Detect.detectFromCamara(this.originList[0], Detect.tempGray)
     }
@@ -792,6 +1122,41 @@ class Detect {
         // @ts-ignore
         return cv.imread(img)
     }
+    static removeSimilarCoordinates(all_center, threshold) {
+        let uniqueCenters = [];
+        for (let center of all_center) {
+            let isUnique = true;
+            for (let uniqueCenter of uniqueCenters) {
+                if (Detect.isSimilar(center, uniqueCenter, threshold)) {
+                    isUnique = false;
+                    break;
+                }
+            }
+            if (isUnique) {
+                uniqueCenters.push(center);
+            }
+        }
+        return uniqueCenters;
+    }
+
+    static findSimilarX(uniqueCenters,findX){
+        let group = []
+        for (let item of uniqueCenters) {
+            if (Math.abs(item.x - findX) < 8){
+                group.push(item);
+            }
+        }
+        return group;
+    }
+    static findSimilarY(uniqueCenters,findY){
+        let group = []
+        for (let item of uniqueCenters) {
+            if (Math.abs(item.y - findY) < 10){
+                group.push(item);
+            }
+        }
+        return group;
+    }
 
     static async readMatFromFile(e: any, index?: number,type:any) {
         index = index || 0
@@ -800,7 +1165,7 @@ class Detect {
         if(type=='1'){
             this.xingce_value=0.5
         }
-        console.log(file)
+        // console.log(file)
         if (file) {
             let fileReader = new FileReader()
 

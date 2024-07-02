@@ -1,4 +1,13 @@
 // @ts-nocheck
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 class AnswerSheetDetect {
     getCenterSortY(innerPoints) {
         // y坐标排序
@@ -213,16 +222,13 @@ class AnswerSheetDetect {
         }
         return Math.round(allH / hCount * 10) / 10;
     }
-    completePhoneArea(uniqueCenters) {
+    completePhoneArea(uniqueCenters, dstW, dstH) {
         uniqueCenters.sort((a, b) => a.y - b.y);
         let defaultY = uniqueCenters[0].y;
         uniqueCenters.sort((a, b) => a.x - b.x);
         let defaultX = uniqueCenters[0].x;
-        let avgW = this.getAvgW(uniqueCenters, 30, 10);
-        let avgH = this.getAvgH(uniqueCenters, 5, 23);
-        if (defaultX > 16 || defaultY > 12 || avgW == 0 || avgH == 0) {
-            return false;
-        }
+        let avgW = this.getAvgW(uniqueCenters, dstW / 11, 10);
+        let avgH = this.getAvgH(uniqueCenters, 10, dstH / 11);
         // console.log(avgH,avgW,defaultY,defaultX)
         let res = [];
         for (let i = 0; i < 11; i++) {
@@ -294,15 +300,15 @@ class AnswerSheetDetect {
         let phoneArea = this.fourPointTransform(warped, phonePoints);
         let last = Math.floor(phoneArea.rows / 4);
         // 定义感兴趣的区域（ROI）
-        let rect = new cv.Rect(6, last + 6, phoneArea.cols - 6, phoneArea.rows - last - 12);
-        let dst = this.resize(phoneArea.roi(rect), 230, 180);
+        let rect = new cv.Rect(0, last, phoneArea.cols, phoneArea.rows - last);
+        let dst = this.resize(phoneArea.roi(rect), warped.size().width * 0.32, warped.size().height * 0.22);
         let phone = new cv.Mat();
-        let phoneSelect = new cv.Mat();
+        // let phoneSelect = new cv.Mat()
         let color = new cv.Mat();
         cv.cvtColor(dst, color, cv.COLOR_RGBA2GRAY);
         // cv.Canny(color,canny,10,255)
-        cv.adaptiveThreshold(color, phone, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 3, 1);
-        cv.adaptiveThreshold(color, phoneSelect, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 33, 1);
+        cv.adaptiveThreshold(color, phone, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 55, 9);
+        // cv.adaptiveThreshold(color, phoneSelect, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 33, 1)
         let contours = new cv.MatVector();
         let hierarchy = new cv.Mat();
         // Find contours
@@ -314,31 +320,34 @@ class AnswerSheetDetect {
         for (let i = 0; i < contours.size(); i++) {
             let contour = contours.get(i);
             let minAreaRect = cv.minAreaRect(contour);
-            if (minAreaRect.size.width > 30 || minAreaRect.size.height > 25) {
+            let maxW = dst.size().width / 10;
+            let maxH = dst.size().height / 10;
+            if (minAreaRect.size.width > maxW || minAreaRect.size.height > maxH) {
                 continue;
             }
+            // cv.drawContours(dst, contours, i, [255, 0, 0,255], 1);
             let area = cv.contourArea(contour);
-            if (area < 170 || area > 250) {
+            if (area > maxW * maxH * 0.8 || area < maxW * maxH * 0.25) {
                 continue;
             }
             all_center.push(minAreaRect.center);
             center2contour.set(minAreaRect.center, contour);
             allWidth += minAreaRect.size.width;
             allHeight += minAreaRect.size.height;
-            cv.drawContours(dst, contours, i, [255, 0, 0, 255], 1);
+            cv.drawContours(dst, contours, i, [0, 255, 0, 255], 1);
         }
         if (all_center.length == 0) {
             return "";
         }
         // unique
         let uniqueCenter = this.removeSimilarCoordinates(all_center, 5);
-        // console.log(uniqueCenter)
+        // console.log("uniqueCenter",uniqueCenter)
         // 补全
-        let completeCenter = this.completePhoneArea(uniqueCenter);
+        let completeCenter = this.completePhoneArea(uniqueCenter, dst.size().width, dst.size().height);
+        // console.log("completeCenter",completeCenter)
         if (completeCenter == false) {
             return "";
         }
-        // console.log(completeCenter)
         let defaultWeight = Math.round(allWidth / center2contour.size * 10) / 10;
         let defaultHeight = Math.round(allHeight / center2contour.size * 10) / 10;
         let phoneStr = "";
@@ -368,23 +377,23 @@ class AnswerSheetDetect {
                     cv.rectangle(dst, sp1, sp2, [0, 0, 255, 255], 1);
                 }
                 let rect = cv.boundingRect(contour);
-                rect.x = rect.x + 3;
-                rect.y = rect.y + 3;
-                rect.width = rect.width - 5;
-                rect.height = rect.height - 5;
+                // rect.x = rect.x + 3
+                // rect.y = rect.y + 3
+                // rect.width = rect.width - 5
+                // rect.height = rect.height - 5
                 // console.log(rect.x, rect.y, rect.width, rect.height)
                 // 裁剪图像，仅保留轮廓区域
-                let cropped_result = phoneSelect.roi(rect);
+                let cropped_result = phone.roi(rect);
                 // let lastGary = new cv.Mat()
                 // cv.cvtColor(cropped_result, lastGary, cv.COLOR_RGBA2GRAY, 0)
                 // 对图像进行二值化处理
                 // let threshold = new cv.Mat()
                 // cv.threshold(lastGary, threshold, 150, 255, cv.THRESH_BINARY);
                 // let cropped_result_phone = phone.roi(rect)
-                let resizeImage = this.resize(cropped_result, 22, 12);
+                // let resizeImage = this.resize(cropped_result,22,12)
                 // cv.cvtColor(resizeImage, resizeImage, cv.COLOR_RGBA2GRAY, 0)
                 // cv.adaptiveThreshold(resizeImage, resizeImage, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 1)
-                let blackPixelCount = this.countBlack(resizeImage);
+                let blackPixelCount = this.countBlack(cropped_result);
                 // 计算黑色像素数
                 // console.log(blackPixelCount)
                 tmpAns.push(blackPixelCount);
@@ -408,6 +417,7 @@ class AnswerSheetDetect {
     getAnswer(sortedGroups, warped) {
         let num = 1;
         let answers = new Map();
+        let arr = []
         // 最后 5 个不处理 因为是最后的标记
         for (let i = 0; i < sortedGroups.length - 5; i++) {
             if (i + 6 > sortedGroups.length - 1) {
@@ -422,13 +432,21 @@ class AnswerSheetDetect {
             points.push(sortedGroups[i + 5]);
             points.push(sortedGroups[i + 6]);
             let ansArea = this.fourPointTransform(warped, points);
-            let resize = this.resize(ansArea, 230, 250);
+            let resize = this.resize(ansArea, warped.size().width / 5, warped.size().height / 8);
             let last = Math.floor(resize.rows / 5);
             // 定义感兴趣的区域（ROI）
-            let rect = new cv.Rect(0, last, resize.cols, resize.rows - last - 5);
+            let rect = new cv.Rect(0, last, resize.cols, resize.rows - last);
             let dst = resize.roi(rect);
-            let ans = this.dealAnswer(dst);
-            // console.log(ans)
+            let ans
+            try{
+                ans = this.dealAnswer(dst);
+            }catch (e) {
+                console.log("dealAnswer err:",e)
+            }
+            console.log("ans",ans)
+            // let ans = this.dealAnswer(ori);
+            arr.push(ans)
+            continue
             // 5 道题
             for (let j = 0; j < 5; j++) {
                 if (j < ans.length) {
@@ -439,12 +457,18 @@ class AnswerSheetDetect {
                 }
                 num++;
             }
+            // oriArea.delete()
+            // ansArea.delete()
+            // resize.delete()
+            // oriAreaResize.delete()
+            // dst.delete()
+            // ori.delete()
         }
-        return answers;
+        return arr;
     }
-    completeAnswer(uniqueCenters) {
-        let default_y = 32.5;
-        let default_x = 34.5;
+    completeAnswer(uniqueCenters, dstW, dstH) {
+        let default_y = dstW * 0.078;
+        let default_x = dstH * 0.29;
         uniqueCenters.sort((a, b) => a.y - b.y);
         if (uniqueCenters[0].y < 45) {
             let group = this.findSimilarY(uniqueCenters, uniqueCenters[0].y);
@@ -455,7 +479,7 @@ class AnswerSheetDetect {
             default_y = Math.round(all / group.length * 10) / 10;
         }
         uniqueCenters.sort((a, b) => a.x - b.x);
-        if (uniqueCenters[0].x < 45) {
+        if (uniqueCenters[0].x < 70) {
             let group = this.findSimilarX(uniqueCenters, uniqueCenters[0].x);
             let all = 0;
             for (let i = 0; i < group.length; i++) {
@@ -463,17 +487,12 @@ class AnswerSheetDetect {
             }
             default_x = Math.round(all / group.length * 10) / 10;
         }
+        // console.log(default_x,default_y)
         // 圆心直接的平均宽度距离
-        let avg_w = this.getAvgW(uniqueCenters, 55, 10);
+        let avg_w = this.getAvgW(uniqueCenters, dstW / 5, 10);
         // 圆心直接的平均高度距离
-        let avg_h = this.getAvgH(uniqueCenters, 10, 50);
-        if (avg_w == 0) {
-            avg_w = 40;
-        }
-        if (avg_h == 0) {
-            avg_h = 40;
-        }
-        // console.log("answer",default_x,default_y,avg_w,avg_h)
+        let avg_h = this.getAvgH(uniqueCenters, 10, dstH / 4.5);
+        // console.log("aaaa",default_x,default_y,avg_w,avg_h)
         uniqueCenters.sort((a, b) => a.y - b.y);
         let res = [];
         for (let i = 0; i < 5; i++) {
@@ -531,42 +550,44 @@ class AnswerSheetDetect {
         return res;
     }
     dealAnswer(dst) {
-        let ans = new cv.Mat();
+        let ans =  new cv.Mat();
         let ansSelect = new cv.Mat();
         let color = new cv.Mat();
-        let imageArr = [];
         cv.cvtColor(dst, color, cv.COLOR_RGBA2GRAY);
-        cv.adaptiveThreshold(color, ans, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 21, 3);
+        cv.adaptiveThreshold(color, ans, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 3);
         cv.adaptiveThreshold(color, ansSelect, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 111, 11);
+
+        color.delete()
         // imageArr.push(ansSelect)
         let contours = new cv.MatVector();
         let hierarchy = new cv.Mat();
         // Find contours
         cv.findContours(ans, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
+        console.log("contours.size()",contours.size())
+
         let all_center = [];
         let center2contour = new Map();
         let allW = 0;
         let allH = 0;
         for (let i = 0; i < contours.size(); i++) {
             let contour = contours.get(i);
-            let area = cv.contourArea(contour);
-            // console.log(area)
-            if (area < 900 || area > 1800) {
-                continue;
-            }
             let minAreaRect = cv.minAreaRect(contour);
-            let area2 = minAreaRect.size.width * minAreaRect.size.height;
-            if (area2 == 0) {
+            // console.log("ddd",minAreaRect.size.width,minAreaRect.size.height)
+            if (minAreaRect.size.width > dst.size().width / 6 || minAreaRect.size.height > dst.size().height / 4.5) {
                 continue;
             }
-            if (0.8 <= area / area2 <= 1.2) {
-                allW += minAreaRect.size.width;
-                allH += minAreaRect.size.height;
-                all_center.push(minAreaRect.center);
-                center2contour.set(minAreaRect.center, contour);
-                cv.drawContours(dst, contours, i, [255, 0, 0, 255], 1);
+            if (minAreaRect.size.width < dst.size().width / 8 || minAreaRect.size.height < dst.size().height / 6.6) {
+                continue;
             }
+            allW += minAreaRect.size.width;
+            allH += minAreaRect.size.height;
+            all_center.push(minAreaRect.center);
+            center2contour.set(minAreaRect.center, contour);
+            // cv.drawContours(dst, contours, i, [255, 0, 0, 255], 1);
         }
+        console.log("all_center",all_center)
+        return ans
+
         if (all_center.length == 0) {
             return [];
         }
@@ -574,7 +595,7 @@ class AnswerSheetDetect {
         // 轮廓去重
         let uniqueCenters = this.removeSimilarCoordinates(all_center, 5);
         // console.log(uniqueCenters)
-        let completeCenters = this.completeAnswer(uniqueCenters);
+        let completeCenters = this.completeAnswer(uniqueCenters, dst.size().width, dst.size().height);
         // console.log(completeCenters)
         let defaultWeight = Math.round(allW / center2contour.size * 10) / 10;
         let defaultHeight = Math.round(allH / center2contour.size * 10) / 10;
@@ -619,19 +640,21 @@ class AnswerSheetDetect {
                 rect.height = rect.height - h * 1.8;
                 // console.log("after",rect.x, rect.y, rect.width, rect.height)
                 let optionsImage = ansSelect.roi(rect);
-                let resizeImage = this.resize(optionsImage, 33, 35);
+                let resizeImage = this.resize(optionsImage, defaultWeight, defaultHeight);
                 // imageArr.push(resizeImage)
                 let blackPixelCount = this.countBlack(resizeImage);
                 // let total = resizeImage.width * resizeImage.height
-                let total = 33 * 35;
+                let total = defaultWeight * defaultHeight;
                 if (Math.round(blackPixelCount / total * 10000) / 10000 > 0.55) {
+                    // console.log('blackPixelCount', Math.round(blackPixelCount/total * 10000) / 10000)
                     tmpBack.push(this.getOptionsAns(j));
                 }
             }
             resAnswer.push(tmpBack);
-            // console.log(tmpBack)
+            console.log(tmpBack);
         }
-        // return dst
+        console.log("------");
+        return dst
         // return [resAnswer,imageArr]
         return resAnswer;
     }
@@ -658,12 +681,15 @@ class AnswerSheetDetect {
             if (ic === 2 && this.isContourCircle(contours.get(i))) {
                 let ellipse = cv.fitEllipse(contours.get(i));
                 let area = Math.PI * ellipse.size.width * ellipse.size.height / 4;
+                if (area > 2000) {
+                    continue;
+                }
                 let arcEll = this.ellipsePerimeter(ellipse.size.width, ellipse.size.height);
                 let arcOri = cv.arcLength(contours.get(i), true) * 2;
                 if (0.90 <= cv.contourArea(contours.get(i)) / area && cv.contourArea(contours.get(i)) / area <= 1.1 &&
                     0.90 <= arcEll / arcOri && arcEll / arcOri <= 1.1) {
                     innerPoints.push(contours.get(i));
-                    cv.drawContours(warped, contours, i, [255, 0, 0, 255], 2);
+                    // cv.drawContours(warped, contours, i, [0, 0, 255,255], 2);
                 }
             }
         }
@@ -673,6 +699,67 @@ class AnswerSheetDetect {
         // Convert to grayscale
         let gray = new cv.Mat();
         cv.cvtColor(mat, gray, cv.COLOR_BGR2GRAY);
+        cv.GaussianBlur(gray, gray, new cv.Size(3, 3), 0, 0);
+        cv.adaptiveThreshold(gray, gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2);
+        let contours = new cv.MatVector();
+        let hierarchy = new cv.Mat();
+        // Find contours
+        cv.findContours(gray, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
+        let count = {};
+        let fePoints = []
+        for (let i = 0; i < contours.size(); i++) {
+            let k = i;
+            let ic = 0;
+            while (hierarchy.intPtr(0, k)[2] !== -1) {
+                k = hierarchy.intPtr(0, k)[2];
+                ic += 1;
+            }
+            if (ic === 4 && this.isContourCircle(contours.get(i))) {
+                k = i;
+                k = hierarchy.intPtr(0, k)[3];
+                if (!(k in count)) {
+                    count[k] = 0;
+                }
+                count[k]++;
+                // 坐标
+                let p = cv.moments(contours.get(i))
+                fePoints.push({
+                    x: p.m10 / p.m00,
+                    y: p.m01 / p.m00
+                })
+                // cv.drawContours(mat, contours, i, [255, 0, 0,255], 2);
+            }
+        }
+
+        let center = -1;
+        for (let obj in count) {
+            if (count[obj] === 4) {
+                center = parseInt(obj);
+                break;
+            }
+        }
+        if (center === -1) {
+            return [fePoints,[]];
+        }
+        // 进行多边形拟合
+        let approxContour = new cv.Mat();
+        // Initialize vertices
+        cv.approxPolyDP(contours.get(center), approxContour, cv.arcLength(contours.get(center), true) * 0.02, true);
+        if (approxContour.rows !== 4) {
+            return [fePoints,[]];
+        }
+        let points2 = [];
+        for (let i = 0; i < approxContour.rows; ++i) {
+            let point = approxContour.data32S.slice(i * 2, (i + 1) * 2);
+            points2.push({ x: point[0], y: point[1] });
+        }
+        return [fePoints,points2];
+    }
+    detectContour(mat) {
+        // Convert to grayscale
+        let gray = new cv.Mat();
+        cv.cvtColor(mat, gray, cv.COLOR_BGR2GRAY);
+        cv.GaussianBlur(gray, gray, new cv.Size(3, 3), 0, 0);
         cv.adaptiveThreshold(gray, gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2);
         let contours = new cv.MatVector();
         let hierarchy = new cv.Mat();
@@ -693,8 +780,10 @@ class AnswerSheetDetect {
                     count[k] = 0;
                 }
                 count[k]++;
+                // cv.drawContours(mat, contours, i, [255, 0, 0,255], 2);
             }
         }
+        console.log("count",count)
         let center = -1;
         for (let obj in count) {
             if (count[obj] === 4) {
@@ -703,22 +792,23 @@ class AnswerSheetDetect {
             }
         }
         if (center === -1) {
-            return [gray];
+            return [];
         }
         // 进行多边形拟合
         let approxContour = new cv.Mat();
         // Initialize vertices
         cv.approxPolyDP(contours.get(center), approxContour, cv.arcLength(contours.get(center), true) * 0.02, true);
         if (approxContour.rows !== 4) {
-            return [gray];
+            return [];
         }
         let points2 = [];
         for (let i = 0; i < approxContour.rows; ++i) {
             let point = approxContour.data32S.slice(i * 2, (i + 1) * 2);
             points2.push({ x: point[0], y: point[1] });
         }
-        return [gray, points2];
+        return points2;
     }
+
     static processMat(mat) {
         let res = {
             status: 400,
@@ -727,31 +817,28 @@ class AnswerSheetDetect {
                 phone: null,
                 answer: null,
             },
-            pic: null
+            points:[],
+            pic: []
         };
         let obj = new AnswerSheetDetect();
         let points = [];
-        let getScreenContourRes;
+        let fePoints = [];
+        res.pic = mat
         try {
-            getScreenContourRes = obj.getScreenContour(mat);
+            [fePoints,points] = obj.getScreenContour(mat);
         }
         catch (e) {
             res.message = "getScreenContour:" + e.toString();
-            res.pic = mat;
             return res;
         }
-        res.pic = getScreenContourRes[0];
-        if (getScreenContourRes.length == 2) {
-            points = getScreenContourRes[1];
-        }
+        res.points = fePoints
         if (points.length !== 4) {
             res.message = "Screen contour not detected, retrying:" + Date.now().toString();
             return res;
         }
         const [innerPoints, warped] = obj.getInnerPoint(mat, points);
         if (!warped || innerPoints.length !== 45) {
-            console.log("Invalid inner points or warped frame, retrying");
-            res.message = "Invalid inner points or warped frame, retrying";
+            res.message = "Invalid inner points or warped frame, retrying,innerPoints count:" + innerPoints.length;
             res.pic = warped;
             return res;
         }
@@ -765,7 +852,6 @@ class AnswerSheetDetect {
             phone = obj.getPhone(sortedGroups, warped);
         }
         catch (e) {
-            res.pic = warped;
             res.message = "getPhone:" + e.toString();
             return res;
         }
@@ -779,14 +865,54 @@ class AnswerSheetDetect {
         let ans;
         try {
             ans = obj.getAnswer(sortedGroups.slice(5, sortedGroups.length), warped);
+            // console.log(ans)
         }
         catch (e) {
             res.message = "getAnswer:" + e.toString();
+            console.log(e);
             return res;
         }
         res.data.answer = ans;
         res.status = 200;
+        res.pic = warped;
         return res;
+    }
+    static processFile(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fileInput = e.target || e;
+            const file = fileInput.files ? fileInput.files : e;
+            if (file) {
+                let fileReader = new FileReader();
+                let imageData = yield new Promise(r => {
+                    fileReader.onload = r;
+                    fileReader.readAsDataURL(file);
+                });
+                let img = new Image();
+                img.src = imageData.target.result;
+                yield new Promise(r => {
+                    img.onload = r;
+                });
+                let mat = cv.imread(img);
+                let result = yield AnswerSheetDetect.processMat(mat);
+                if (result.status !== 200) {
+                    return {
+                        status: "success",
+                        message: result.message,
+                    }
+                }
+                // deal ans
+                let arrAns = [];
+                for (let [key, value] of result.data.answer) {
+                    arrAns.push({ id: key, answer: value.map(str => str.toLowerCase()) });
+                }
+                return {
+                    status: "success",
+                    strp: 4,
+                    phone: result.data.phone,
+                    answer: arrAns,
+                };
+            }
+        });
     }
 }
 export default AnswerSheetDetect;
