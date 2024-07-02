@@ -7,6 +7,7 @@
 * Go
 ** [Channel](Go/深入理解Go-channel.md)
 ** [Map](Go/深入理解Go-Map.md)
+** [sync.Map](Go/深入理解Go-Sync.Map.md)
 ** [Mutex](Go/深入理解Go-mutex.md)
 ** [Slice](Go/深入理解Go-slice.md)
 ** [Defer](Go/深入理解Go语言-Defer.md)
