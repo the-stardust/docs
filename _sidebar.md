@@ -34,6 +34,7 @@
 ** [详解redis跳跃表](Redis/redis-跳跃表.md)
 ** [持久化](Redis/redis-持久化.md)
 ** [集群与分布式](Redis/redis集群与分布式.md)
+** [哨兵](Redis/redis哨兵.md)
 ** [Redis的事件模型](Redis/事件模型.md)
 ** [延迟队列](Redis/手写redis延时队列.md)
 ** [Redis缓存失效](Redis/redis缓存击穿、雪崩、穿透.md)
@@ -50,8 +51,6 @@
 * 消息队列
 ** [Kafka学习笔记](消息队列/kafka.md)
 ** [消息队列学习笔记](消息队列/消息队列.md)
-* Zookeeper
-** Zookeeper学习笔记(未完成)
 * Kubernetes&docker
 ** [学习笔记-docker](Kubernetea/学习笔记-容器.md)
 ** [概念](Kubernetea/概念.md)
@@ -63,8 +62,17 @@
 * 高并发架构
 ** [分布式事务](高并发架构/分布式事务.md)
 ** [分布式锁](高并发架构/分布式锁.md)
+** [分布式唯一 id](高并发架构/分布式唯一id.md)
 ** [数据一致性问题](高并发架构/数据库与缓存双写不一致的问题.md)
 ** [nginx、php-fpm协作](高并发架构/详细解析nginx、php-fpm、php是如何协作的.md)
 ** [url输入浏览器后的流程](高并发架构/url从浏览器输入后的流程.md)
 ** [限流、降级、熔断](高并发架构/限流.md)
 ** [分布式唯一id算法](高并发架构/分布式唯一id.md)
+** [项目重构](高并发架构/项目重构.md)
+* 算法
+** [lru](leetcode/lru.md)
+** [二叉树遍历](leetcode/二叉树的遍历.md)
+** [动态规划](leetcode/动态规划.md)
+** [回溯](leetcode/回溯.md)
+** [数组排序](leetcode/数组排序.md)
+** [链表系列](leetcode/链表.md)
